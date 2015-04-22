@@ -447,6 +447,17 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
     return 1;
 }
 
+- (BOOL)isOutgoingMessage:(JSQMessagesCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    id<JSQMessageData> messageData = [collectionView.dataSource collectionView:collectionView messageDataForItemAtIndexPath:indexPath];
+    NSParameterAssert(messageData != nil);
+    
+    NSString *messageSender = [messageData sender];
+    NSParameterAssert(messageSender != nil);
+    
+    return [messageSender isEqualToString:self.sender];
+}
+
 - (UICollectionViewCell *)collectionView:(JSQMessagesCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     id<JSQMessageData> messageItem = [collectionView.dataSource collectionView:collectionView messageDataForItemAtIndexPath:indexPath];
@@ -455,7 +466,7 @@ static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObserv
     NSString *messageSenderId = [messageItem senderId];
     NSParameterAssert(messageSenderId != nil);
 
-    BOOL isOutgoingMessage = [messageSenderId isEqualToString:self.senderId];
+    BOOL isOutgoingMessage = [self isOutgoingMessage:collectionView cellForItemAtIndexPath:indexPath];
     BOOL isMediaMessage = [messageItem isMediaMessage];
 
     NSString *cellIdentifier = nil;
