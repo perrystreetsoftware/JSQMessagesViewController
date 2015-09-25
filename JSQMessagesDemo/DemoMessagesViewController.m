@@ -657,4 +657,12 @@
     return YES;
 }
 
+- (UIView *)inputAccessoryView {
+    return self.inputToolbar;
+}
+
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
 @end
