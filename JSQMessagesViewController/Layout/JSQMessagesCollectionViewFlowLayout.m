@@ -310,7 +310,17 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
             [self jsq_configureMessageCellLayoutAttributes:attributesItem];
         }
         else {
-            attributesItem.zIndex = -1;
+            // ES edited -- fix crashing bug caused by changing the zIndex and
+            // also calling performBatchUpdates at the same time -- here is the
+            // reported crash:
+            /*
+             Fatal Exception: NSInternalInconsistencyException
+             layout attributes for supplementary item at index path (<NSIndexPath: 0xc000000000000016> {length = 2, path = 0 - 0}) changed from <JSQMessagesCollectionViewLayoutAttributes: 0x10d129870> index path: (<NSIndexPath: 0xc000000000000016> {length = 2, path = 0 - 0}); element kind: (UICollectionElementKindSectionHeader); frame = (0 0; 414 100); zIndex = 10; to <JSQMessagesCollectionViewLayoutAttributes: 0x101987360> index path: (<NSIndexPath: 0xc000000000000016> {length = 2, path = 0 - 0}); element kind: (UICollectionElementKindSectionHeader); frame = (0 0; 414 100); zIndex = -1; without invalidating the layout
+             */
+
+            // We don't know why this library is even tweaking the zIndex at all, so
+            // we are just going to remove this line for now
+            // attributesItem.zIndex = -1;
         }
     }];
     
