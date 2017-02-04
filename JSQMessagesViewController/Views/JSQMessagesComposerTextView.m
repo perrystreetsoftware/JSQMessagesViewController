@@ -147,6 +147,18 @@
     }
 }
 
+// es added -- support animated GIF keyboards
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+
+    if (action == @selector(paste:)) {
+        return [UIPasteboard generalPasteboard].string != nil || [UIPasteboard generalPasteboard].image != nil;
+    }
+
+    [UIMenuController sharedMenuController].menuItems = nil;
+
+    return [super canPerformAction:action withSender:sender];
+}
+
 #pragma mark - Drawing
 
 - (void)drawRect:(CGRect)rect
@@ -226,8 +238,4 @@
     return [super becomeFirstResponder];
 }
 
-- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
-    [UIMenuController sharedMenuController].menuItems = nil;
-    return [super canPerformAction:action withSender:sender];
-}
 @end
