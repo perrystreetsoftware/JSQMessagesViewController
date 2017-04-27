@@ -124,9 +124,16 @@ JSQMessagesKeyboardControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet JSQMessagesCollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet JSQMessagesInputToolbar *inputToolbar;
+@property (weak, nonatomic) IBOutlet UIView *pickerToolbar;
+@property (weak, nonatomic) IBOutlet UIView *adContainerView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *toolbarHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *toolbarBottomLayoutGuide;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pickerToolbarHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pickerViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *adContainerHeightConstraint;
+
+@property (assign, nonatomic) BOOL isAdVisible;
 
 @property (weak, nonatomic) UIView *snapshotView;
 
@@ -201,6 +208,15 @@ JSQMessagesKeyboardControllerDelegate>
     self.showLoadEarlierMessagesHeader = NO;
 
     self.topContentAdditionalInset = 0.0f;
+
+    self.bottomContentAdditionalInset = [self targetAdHeight];
+
+    self.isAdVisible = YES;
+
+    self.adContainerView.clipsToBounds = YES;
+    self.adContainerView.accessibilityLabel = @"Ad Container";
+
+    self.pickerView = [UIView new];
 
     [self jsq_updateCollectionViewInsets];
 
@@ -307,6 +323,10 @@ JSQMessagesKeyboardControllerDelegate>
 {
     [super viewWillDisappear:animated];
     self.collectionView.collectionViewLayout.springinessEnabled = NO;
+
+    self.isPickerViewVisible = NO;
+
+    [self.inputToolbar.contentView.textView resignFirstResponder];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -912,6 +932,16 @@ JSQMessagesKeyboardControllerDelegate>
 
     heightFromBottom = MAX(0.0, heightFromBottom);
 
+    // Hide the picker view if the keyboard/input view is dismissed via the
+    // pan gesture recognizer
+
+    if (heightFromBottom == 0.0 && self.isPickerViewVisible) {
+        self.isPickerViewVisible = NO;
+    }
+
+    // Show/hide the ad container view
+    self.isAdVisible = heightFromBottom == 0.0;
+
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
 
@@ -1054,8 +1084,18 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_updateCollectionViewInsets
 {
+    CGRect bottomFrame = self.inputToolbar.isHidden ? self.pickerToolbar.frame : self.inputToolbar.frame;
+
+    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(bottomFrame);
+
+    CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
+
+    self.adContainerHeightConstraint.constant = adContainerInset;
+
     [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
-                                  bottomValue:CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(self.inputToolbar.frame)];
+                                  bottomValue:defaultBottomInset + adContainerInset];
+
+
 }
 
 - (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top bottomValue:(CGFloat)bottom
@@ -1150,6 +1190,50 @@ JSQMessagesKeyboardControllerDelegate>
                                                                       action:@selector(jsq_handleInteractivePopGestureRecognizer:)];
         self.currentInteractivePopGestureRecognizer = self.navigationController.interactivePopGestureRecognizer;
     }
+}
+
+#pragma mark - Scruff Additions
+
+- (void)setIsPickerViewVisible:(BOOL)isPickerViewVisible {
+    if (_isPickerViewVisible != isPickerViewVisible) {
+        _isPickerViewVisible = isPickerViewVisible;
+
+        if (isPickerViewVisible) {
+            // Hide the input toolbar
+            [self.inputToolbar setHidden:YES];
+
+            // Set the custom input view of the input toolbar's textView to
+            // the pickerView, which replaces the keyboard.
+            self.inputToolbar.contentView.textView.customInputView = self.pickerView;
+
+            // Make sure the textView is first responder so the keyboard - or in
+            // this case the pickerView - becomes visible
+            [self.inputToolbar.contentView.textView becomeFirstResponder];
+
+            // We don't want the keyboard's shortcut bar to display above the
+            // pickerView since it's unnecessary, so we need to clear it out
+            UITextInputAssistantItem *item = self.inputToolbar.contentView.textView.inputAssistantItem;
+
+            item.leadingBarButtonGroups = @[];
+            item.trailingBarButtonGroups = @[];
+        } else {
+            // First, hide the pickerView
+            [self.inputToolbar.contentView.textView resignFirstResponder];
+
+            // Set the custom inputView to nil to restore the keyboard
+            self.inputToolbar.contentView.textView.customInputView = nil;
+
+            // Show the input toolbar again
+            [self.inputToolbar setHidden:NO];
+        }
+
+        [self.inputToolbar.contentView.textView reloadInputViews];
+    }
+}
+
+// Override in subclass to change the ad height
+- (CGFloat)targetAdHeight {
+    return 44.0;
 }
 
 @end

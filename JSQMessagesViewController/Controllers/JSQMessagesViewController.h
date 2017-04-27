@@ -172,6 +172,33 @@
  */
 @property (assign, nonatomic) CGFloat topContentAdditionalInset;
 
+/**
+ *  Returns the picker toolbar view object managed by this view controller.
+ */
+@property (weak, readonly, nonatomic) IBOutlet UIView *pickerToolbar;
+
+/**
+ *  Returns the picker view object managed by this view controller.
+ */
+@property (strong, nonatomic) UIView *pickerView;
+
+/**
+ *  Returns the ad container view object managed by this view controller.
+ */
+@property (weak, readonly, nonatomic) IBOutlet UIView *adContainerView;
+
+/**
+ *  Determines if the picker view is visible.
+ */
+@property (assign, nonatomic) BOOL isPickerViewVisible;
+
+/**
+ *  Specifies an additional inset amount to be added to the collectionView's contentInsets.bottom value.
+ *
+ *  @discussion Use this property to adjust the bottom content inset to account for a custom subview at the bottom of your view controller.
+ */
+@property (assign, nonatomic) CGFloat bottomContentAdditionalInset;
+
 #pragma mark - Class methods
 
 /**

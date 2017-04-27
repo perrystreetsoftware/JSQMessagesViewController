@@ -189,4 +189,12 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
     [self.textView setNeedsDisplay];
 }
 
+#pragma mark - Scruff Additions
+
+- (void)setIsRightBarButtonItemHidden:(BOOL)isRightBarButtonItemHidden {
+    _isRightBarButtonItemHidden = isRightBarButtonItemHidden;
+
+    self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+}
+
 @end

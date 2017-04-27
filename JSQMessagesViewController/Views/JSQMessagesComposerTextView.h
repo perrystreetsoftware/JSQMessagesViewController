@@ -57,6 +57,8 @@
  */
 @property (weak, nonatomic) id<JSQMessagesComposerTextViewPasteDelegate> pasteDelegate;
 
+@property (strong, nonatomic) UIView *customInputView;
+
 /**
  *  Determines whether or not the text view contains text after trimming white space 
  *  from the front and back of its string.

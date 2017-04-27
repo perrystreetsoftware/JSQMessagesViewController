@@ -110,7 +110,8 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     BOOL hasText = [self.contentView.textView hasText];
 
     if (self.sendButtonOnRight) {
-        self.contentView.rightBarButtonItem.enabled = hasText;
+        // Show/hide the send button instead of dimming it
+        self.contentView.isRightBarButtonItemHidden = !hasText;
     }
     else {
         self.contentView.leftBarButtonItem.enabled = hasText;
