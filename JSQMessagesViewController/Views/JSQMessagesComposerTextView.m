@@ -238,4 +238,14 @@
     return [super becomeFirstResponder];
 }
 
+#pragma mark - Override inputView
+
+- (UIView *)inputView {
+    if (self.customInputView) {
+        return self.customInputView;
+    } else {
+        return [super inputView];
+    }
+}
+
 @end
