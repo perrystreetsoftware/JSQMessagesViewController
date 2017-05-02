@@ -351,4 +351,16 @@
  */
 - (void)didReceiveMenuWillHideNotification:(NSNotification *)notification;
 
+/**
+ Shows the picker view.
+ */
+- (void)showPickerView;
+
+/**
+ * Hides the picker view.
+ *
+ * @param showKeyboard Whether or not to show the keyboard after hiding.
+ */
+- (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard;
+
 @end

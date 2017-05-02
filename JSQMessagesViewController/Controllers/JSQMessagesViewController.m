@@ -1194,40 +1194,50 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - Scruff Additions
 
-- (void)setIsPickerViewVisible:(BOOL)isPickerViewVisible {
-    if (_isPickerViewVisible != isPickerViewVisible) {
-        _isPickerViewVisible = isPickerViewVisible;
+- (void)showPickerView {
+    self.isPickerViewVisible = YES;
 
-        if (isPickerViewVisible) {
-            // Hide the input toolbar
-            [self.inputToolbar setHidden:YES];
+    // Hide the input toolbar
+    [self.inputToolbar setHidden:YES];
 
-            // Set the custom input view of the input toolbar's textView to
-            // the pickerView, which replaces the keyboard.
-            self.inputToolbar.contentView.textView.inputView = self.pickerView;
+    // Set the custom input view of the input toolbar's textView to
+    // the pickerView, which replaces the keyboard.
+    self.inputToolbar.contentView.textView.inputView = self.pickerView;
 
-            // Make sure the textView is first responder so the keyboard - or in
-            // this case the pickerView - becomes visible
-            [self.inputToolbar.contentView.textView becomeFirstResponder];
+    [self.inputToolbar.contentView.textView reloadInputViews];
 
-            // We don't want the keyboard's shortcut bar to display above the
-            // pickerView since it's unnecessary, so we need to clear it out
-            UITextInputAssistantItem *item = self.inputToolbar.contentView.textView.inputAssistantItem;
+    // Make sure the textView is first responder so the keyboard - or in
+    // this case the pickerView - becomes visible
+    [self.inputToolbar.contentView.textView becomeFirstResponder];
 
-            item.leadingBarButtonGroups = @[];
-            item.trailingBarButtonGroups = @[];
-        } else {
-            // First, hide the pickerView
-            [self.inputToolbar.contentView.textView resignFirstResponder];
+    // We don't want the keyboard's shortcut bar to display above the
+    // pickerView since it's unnecessary, so we need to clear it out
+    UITextInputAssistantItem *item = self.inputToolbar.contentView.textView.inputAssistantItem;
 
-            // Set the custom inputView to nil to restore the keyboard
-            self.inputToolbar.contentView.textView.inputView = nil;
+    item.leadingBarButtonGroups = @[];
+    item.trailingBarButtonGroups = @[];
+}
 
-            // Show the input toolbar again
-            [self.inputToolbar setHidden:NO];
-        }
+- (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard {
+    self.isPickerViewVisible = NO;
 
-        [self.inputToolbar.contentView.textView reloadInputViews];
+    if (!showKeyboard) {
+        // First, hide the pickerView
+        [self.inputToolbar.contentView.textView resignFirstResponder];
+    }
+
+    // Set the custom inputView to nil to restore the keyboard
+    self.inputToolbar.contentView.textView.inputView = nil;
+
+    // Show the input toolbar again
+    [self.inputToolbar setHidden:NO];
+
+    [self.inputToolbar.contentView.textView reloadInputViews];
+
+    if (showKeyboard) {
+        [self.inputToolbar.contentView.textView becomeFirstResponder];
+        [self jsq_updateCollectionViewInsets];
+        [self scrollToBottomAnimated:NO];
     }
 }
 
