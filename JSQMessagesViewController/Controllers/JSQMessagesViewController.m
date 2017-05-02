@@ -1204,7 +1204,7 @@ JSQMessagesKeyboardControllerDelegate>
 
             // Set the custom input view of the input toolbar's textView to
             // the pickerView, which replaces the keyboard.
-            self.inputToolbar.contentView.textView.customInputView = self.pickerView;
+            self.inputToolbar.contentView.textView.inputView = self.pickerView;
 
             // Make sure the textView is first responder so the keyboard - or in
             // this case the pickerView - becomes visible
@@ -1221,7 +1221,7 @@ JSQMessagesKeyboardControllerDelegate>
             [self.inputToolbar.contentView.textView resignFirstResponder];
 
             // Set the custom inputView to nil to restore the keyboard
-            self.inputToolbar.contentView.textView.customInputView = nil;
+            self.inputToolbar.contentView.textView.inputView = nil;
 
             // Show the input toolbar again
             [self.inputToolbar setHidden:NO];
