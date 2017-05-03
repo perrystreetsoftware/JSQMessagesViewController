@@ -936,7 +936,7 @@ JSQMessagesKeyboardControllerDelegate>
     // pan gesture recognizer
 
     if (heightFromBottom == 0.0 && self.isPickerViewVisible) {
-        self.isPickerViewVisible = NO;
+        [self hidePickerViewShowingKeyboard:NO];
     }
 
     // Show/hide the ad container view
@@ -952,6 +952,7 @@ JSQMessagesKeyboardControllerDelegate>
     [self.view layoutIfNeeded];
 
     [self jsq_updateCollectionViewInsets];
+    [self scrollToBottomAnimated:NO];
 }
 
 - (void)jsq_updateKeyboardTriggerPoint
