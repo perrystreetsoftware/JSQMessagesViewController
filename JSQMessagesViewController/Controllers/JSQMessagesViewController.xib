@@ -33,11 +33,11 @@
                     <collectionViewLayout key="collectionViewLayout" id="dZl-7C-LHR" customClass="JSQMessagesCollectionViewFlowLayout"/>
                     <cells/>
                 </collectionView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zzs-Q5-fZU">
-                    <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fPR-Lt-bJA">
+                    <rect key="frame" x="0.0" y="535" width="375" height="44"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="44" id="tUU-8G-ZTp"/>
+                        <constraint firstAttribute="height" constant="44" id="x5d-XU-bxC"/>
                     </constraints>
                 </view>
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BoD-Az-3DM" customClass="JSQMessagesInputToolbar">
@@ -47,11 +47,11 @@
                     </constraints>
                     <items/>
                 </toolbar>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fPR-Lt-bJA">
-                    <rect key="frame" x="0.0" y="535" width="375" height="44"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zzs-Q5-fZU">
+                    <rect key="frame" x="0.0" y="623" width="375" height="44"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="44" id="x5d-XU-bxC"/>
+                        <constraint firstAttribute="height" constant="44" id="tUU-8G-ZTp"/>
                     </constraints>
                 </view>
             </subviews>

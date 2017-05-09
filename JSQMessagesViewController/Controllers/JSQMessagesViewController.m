@@ -1199,7 +1199,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.isPickerViewVisible = YES;
 
     // Hide the input toolbar
-    [self.inputToolbar setHidden:YES];
+    [self setInputToolbarHidden:YES];
 
     // Set the custom input view of the input toolbar's textView to
     // the pickerView, which replaces the keyboard.
@@ -1231,7 +1231,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.inputToolbar.contentView.textView.inputView = nil;
 
     // Show the input toolbar again
-    [self.inputToolbar setHidden:NO];
+    [self setInputToolbarHidden:NO];
 
     [self.inputToolbar.contentView.textView reloadInputViews];
 
@@ -1240,6 +1240,26 @@ JSQMessagesKeyboardControllerDelegate>
         [self jsq_updateCollectionViewInsets];
         [self scrollToBottomAnimated:NO];
     }
+}
+
+- (void)setInputToolbarHidden:(BOOL)hidden {
+    CGFloat transformY = self.toolbarHeightConstraint.constant;
+
+    if (!hidden) {
+        [self.inputToolbar setHidden:NO];
+    }
+
+    [UIView animateWithDuration:0.25 animations:^{
+        if (hidden) {
+            self.inputToolbar.transform = CGAffineTransformMakeTranslation(0.0, transformY);
+        } else {
+            self.inputToolbar.transform = CGAffineTransformIdentity;
+        }
+    } completion:^(BOOL finished) {
+        if (hidden) {
+            [self.inputToolbar setHidden:YES];
+        }
+    }];
 }
 
 // Override in subclass to change the ad height
