@@ -840,9 +840,13 @@ JSQMessagesKeyboardControllerDelegate>
 
     [self.inputToolbar toggleSendButtonEnabled];
 
-    if (self.inputToolbar.contentView.searchResultsContainerView &&
-        [self.inputToolbar.contentView.searchResultsContainerView respondsToSelector:@selector(textViewDidChange:)]) {
-        [self.inputToolbar.contentView.searchResultsContainerView performSelectorOnMainThread:@selector(textViewDidChange:) withObject:textView waitUntilDone:NO];
+    if (self.inputToolbar.contentView.searchResultsContainerView.subviews.count > 0) {
+        UIView *subview = self.inputToolbar.contentView.searchResultsContainerView.subviews[0];
+
+        if (subview &&
+            [subview respondsToSelector:@selector(textViewDidChange:)]) {
+            [subview performSelectorOnMainThread:@selector(textViewDidChange:) withObject:textView waitUntilDone:NO];
+        }
     }
 }
 
@@ -923,31 +927,37 @@ JSQMessagesKeyboardControllerDelegate>
             }
         } else if (object == self.inputToolbar.contentView.searchResultsContainerView &&
                    [keyPath isEqualToString:@"hidden"]) {
-            CGFloat hiddenMargin = self.inputToolbar.contentView.topOffsetMarginConstraint.constant;
-            CGFloat visibleMargin = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 2*hiddenMargin;
+            CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
+            CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
 
             BOOL oldHidden = [[change objectForKey:NSKeyValueChangeOldKey] boolValue];
             BOOL newHidden = [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
 
-            CGFloat oldOffset = oldHidden ? hiddenMargin : visibleMargin;
-            CGFloat newOffset = newHidden ? hiddenMargin : visibleMargin;
+            CGFloat oldOffset = oldHidden ? hiddenHeight : visibleHeight;
+            CGFloat newOffset = newHidden ? hiddenHeight : visibleHeight;
 
             CGFloat dy = newOffset - oldOffset;
 
-            [UIView animateWithDuration:kSearchResultsContainerViewTransitionDuration
-                                  delay:0
-                                options:UIViewAnimationOptionCurveEaseOut
-                             animations:^{
-                                 [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy];
-                                 [self jsq_updateCollectionViewInsets];
-                             }
-                             completion:^(BOOL finished) {
-                                 if (self.automaticallyScrollsToMostRecentMessage) {
-                                     [self scrollToBottomAnimated:NO];
-                                 }
+            if (newHidden) { // avoid breaking layout constraint, do early on hide
+                [self.inputToolbar.contentView updatePreferredTopOffsetConstraintValue];
+            }
 
-                                 [self.inputToolbar toggleSendButtonEnabled];
-                             }];
+            [self jsq_adjustInputToolbarHeightConstraintByDelta:dy layout:NO];
+            [self jsq_updateKeyboardTriggerPoint];
+
+            if (oldHidden) { // avoid breaking layout constraint, do late on show
+                [self.inputToolbar.contentView updatePreferredTopOffsetConstraintValue];
+            }
+            [self.view setNeedsUpdateConstraints];
+            [self.view layoutIfNeeded];
+
+            [self jsq_updateCollectionViewInsets];
+
+            if (self.automaticallyScrollsToMostRecentMessage) {
+                [self scrollToBottomAnimated:NO];
+            }
+            
+            [self.inputToolbar toggleSendButtonEnabled];
         }
     }
 }
@@ -1079,6 +1089,11 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy
 {
+    [self jsq_adjustInputToolbarHeightConstraintByDelta:dy layout:YES];
+}
+
+- (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy layout:(BOOL)forceLayout
+{
     CGFloat proposedHeight = self.toolbarHeightConstraint.constant + dy;
 
     CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight);
@@ -1089,8 +1104,11 @@ JSQMessagesKeyboardControllerDelegate>
 
     if (self.toolbarHeightConstraint.constant != finalHeight) {
         self.toolbarHeightConstraint.constant = finalHeight;
-        [self.view setNeedsUpdateConstraints];
-        [self.view layoutIfNeeded];
+
+        if (forceLayout) {
+            [self.view setNeedsUpdateConstraints];
+            [self.view layoutIfNeeded];
+        }
     }
 }
 
