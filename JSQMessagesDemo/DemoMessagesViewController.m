@@ -351,15 +351,30 @@
 
 - (void)didPressAccessoryButton:(UIButton *)sender
 {
-    [self.inputToolbar.contentView.textView resignFirstResponder];
+    if (self.inputToolbar.contentView.searchResultsContainerViewHidden) {
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
+        label.text = @"Test";
+        label.numberOfLines = 0;
+        label.backgroundColor = [UIColor orangeColor];
+        label.translatesAutoresizingMaskIntoConstraints = NO;
+        self.inputToolbar.contentView.searchResultsContainerView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Media messages"
-                                                       delegate:self
-                                              cancelButtonTitle:@"Cancel"
-                                         destructiveButtonTitle:nil
-                                              otherButtonTitles:@"Send photo", @"Send location", @"Send video", @"Send audio", nil];
-    
-    [sheet showFromToolbar:self.inputToolbar];
+        NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(label);
+
+        [self.inputToolbar.contentView.searchResultsContainerView addSubview:label];
+        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[label]|" options:0 metrics:0 views:viewsDictionary]];
+        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[label]|" options:0 metrics:0 views:viewsDictionary]];
+        
+        [self.view layoutIfNeeded];
+
+        self.inputToolbar.contentView.searchResultsContainerViewHidden = NO;
+    } else {
+        self.inputToolbar.contentView.searchResultsContainerViewHidden = YES;
+
+        for (UIView *v in self.inputToolbar.contentView.searchResultsContainerView.subviews) {
+            [v removeFromSuperview];
+        }
+    }
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex

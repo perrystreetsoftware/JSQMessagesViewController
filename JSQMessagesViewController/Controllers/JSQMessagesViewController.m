@@ -117,7 +117,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObservingContext;
 
-
+static const CGFloat kSearchResultsContainerViewTransitionDuration = 0.3;
 
 @interface JSQMessagesViewController () <JSQMessagesInputToolbarDelegate,
 JSQMessagesKeyboardControllerDelegate>
@@ -839,6 +839,11 @@ JSQMessagesKeyboardControllerDelegate>
     }
 
     [self.inputToolbar toggleSendButtonEnabled];
+
+    if (self.inputToolbar.contentView.searchResultsContainerView &&
+        [self.inputToolbar.contentView.searchResultsContainerView respondsToSelector:@selector(textViewDidChange:)]) {
+        [self.inputToolbar.contentView.searchResultsContainerView performSelectorOnMainThread:@selector(textViewDidChange:) withObject:textView waitUntilDone:NO];
+    }
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
@@ -916,6 +921,33 @@ JSQMessagesKeyboardControllerDelegate>
             if (self.automaticallyScrollsToMostRecentMessage) {
                 [self scrollToBottomAnimated:NO];
             }
+        } else if (object == self.inputToolbar.contentView.searchResultsContainerView &&
+                   [keyPath isEqualToString:@"hidden"]) {
+            CGFloat hiddenMargin = self.inputToolbar.contentView.topOffsetMarginConstraint.constant;
+            CGFloat visibleMargin = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 2*hiddenMargin;
+
+            BOOL oldHidden = [[change objectForKey:NSKeyValueChangeOldKey] boolValue];
+            BOOL newHidden = [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
+
+            CGFloat oldOffset = oldHidden ? hiddenMargin : visibleMargin;
+            CGFloat newOffset = newHidden ? hiddenMargin : visibleMargin;
+
+            CGFloat dy = newOffset - oldOffset;
+
+            [UIView animateWithDuration:kSearchResultsContainerViewTransitionDuration
+                                  delay:0
+                                options:UIViewAnimationOptionCurveEaseOut
+                             animations:^{
+                                 [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy];
+                                 [self jsq_updateCollectionViewInsets];
+                             }
+                             completion:^(BOOL finished) {
+                                 if (self.automaticallyScrollsToMostRecentMessage) {
+                                     [self scrollToBottomAnimated:NO];
+                                 }
+
+                                 [self.inputToolbar toggleSendButtonEnabled];
+                             }];
         }
     }
 }
@@ -1126,6 +1158,11 @@ JSQMessagesKeyboardControllerDelegate>
                                                 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
                                                 context:kJSQMessagesKeyValueObservingContext];
 
+    [self.inputToolbar.contentView.searchResultsContainerView addObserver:self
+                                                               forKeyPath:@"hidden"
+                                                                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                                                                  context:kJSQMessagesKeyValueObservingContext];
+
     self.jsq_isObserving = YES;
 }
 
@@ -1138,6 +1175,9 @@ JSQMessagesKeyboardControllerDelegate>
     @try {
         [_inputToolbar.contentView.textView removeObserver:self
                                                 forKeyPath:NSStringFromSelector(@selector(contentSize))
+                                                   context:kJSQMessagesKeyValueObservingContext];
+        [_inputToolbar.contentView.searchResultsContainerView removeObserver:self
+                                                forKeyPath:@"hidden"
                                                    context:kJSQMessagesKeyValueObservingContext];
     }
     @catch (NSException * __unused exception) { }

@@ -363,4 +363,6 @@
  */
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard;
 
+- (NSString *)jsq_currentlyComposedMessageText;
+
 @end

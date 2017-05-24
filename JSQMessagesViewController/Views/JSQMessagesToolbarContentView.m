@@ -58,6 +58,7 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
 
     [self setTranslatesAutoresizingMaskIntoConstraints:NO];
 
+    self.searchResultsContainerViewHidden = YES;
     self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
     self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
 
@@ -195,6 +196,20 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
     _isRightBarButtonItemHidden = isRightBarButtonItemHidden;
 
     self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+}
+
+- (void)setSearchResultsContainerViewHidden:(BOOL)value {
+    _searchResultsContainerViewHidden = value;
+
+    if (!value) {
+        CGSize preferredSize = [self.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+
+        self.textViewTopOffsetConstraint.constant = preferredSize.height + 2 * self.topOffsetMarginConstraint.constant;
+    } else {
+        self.textViewTopOffsetConstraint.constant = self.topOffsetMarginConstraint.constant;
+    }
+
+    self.searchResultsContainerView.hidden = value;
 }
 
 @end
