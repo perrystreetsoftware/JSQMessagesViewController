@@ -929,7 +929,9 @@ JSQMessagesKeyboardControllerDelegate>
     }
 }
 
-- (void)searchResultsContainerViewVisible:(BOOL)visible {
+- (void)toggleSearchResultsContainerViewVisible {
+    BOOL visible = self.inputToolbar.contentView.searchResultsContainerView.hidden;
+
     CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
     CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
 
@@ -942,7 +944,9 @@ JSQMessagesKeyboardControllerDelegate>
         self.inputToolbar.contentView.searchResultsContainerView.hidden = NO;
     }
 
-    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    [UIView animateWithDuration:kSearchResultsContainerViewTransitionDuration
+                          delay:0
+                        options:UIViewAnimationOptionCurveEaseOut animations:^{
         [self jsq_adjustInputToolbarHeightConstraintByDelta:dy];
         [self jsq_updateKeyboardTriggerPoint];
 
@@ -1092,11 +1096,6 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy
 {
-    [self jsq_adjustInputToolbarHeightConstraintByDelta:dy layout:YES];
-}
-
-- (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy layout:(BOOL)forceLayout
-{
     CGFloat proposedHeight = self.toolbarHeightConstraint.constant + dy;
 
     CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight);
@@ -1108,10 +1107,8 @@ JSQMessagesKeyboardControllerDelegate>
     if (self.toolbarHeightConstraint.constant != finalHeight) {
         self.toolbarHeightConstraint.constant = finalHeight;
 
-        if (forceLayout) {
-            [self.view setNeedsUpdateConstraints];
-            [self.view layoutIfNeeded];
-        }
+        [self.view setNeedsUpdateConstraints];
+        [self.view layoutIfNeeded];
     }
 }
 
