@@ -115,11 +115,8 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
 
 // SCRUFF Additions
 @property (weak, nonatomic) IBOutlet UIView *searchResultsContainerView;
-@property (assign, nonatomic) BOOL searchResultsContainerViewHidden;
 @property (readonly, nonatomic) CGFloat visibleTopOffsetConstraintValue;
 @property (readonly, nonatomic) CGFloat hiddenTopOffsetConstraintValue;
-
-- (void)updatePreferredTopOffsetConstraintValue;
 
 #pragma mark - Class methods
 

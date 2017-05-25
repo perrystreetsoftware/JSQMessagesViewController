@@ -925,41 +925,44 @@ JSQMessagesKeyboardControllerDelegate>
             if (self.automaticallyScrollsToMostRecentMessage) {
                 [self scrollToBottomAnimated:NO];
             }
-        } else if (object == self.inputToolbar.contentView.searchResultsContainerView &&
-                   [keyPath isEqualToString:@"hidden"]) {
-            CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
-            CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
-
-            BOOL oldHidden = [[change objectForKey:NSKeyValueChangeOldKey] boolValue];
-            BOOL newHidden = [[change objectForKey:NSKeyValueChangeNewKey] boolValue];
-
-            CGFloat oldOffset = oldHidden ? hiddenHeight : visibleHeight;
-            CGFloat newOffset = newHidden ? hiddenHeight : visibleHeight;
-
-            CGFloat dy = newOffset - oldOffset;
-
-            if (newHidden) { // avoid breaking layout constraint, do early on hide
-                [self.inputToolbar.contentView updatePreferredTopOffsetConstraintValue];
-            }
-
-            [self jsq_adjustInputToolbarHeightConstraintByDelta:dy layout:NO];
-            [self jsq_updateKeyboardTriggerPoint];
-
-            if (oldHidden) { // avoid breaking layout constraint, do late on show
-                [self.inputToolbar.contentView updatePreferredTopOffsetConstraintValue];
-            }
-            [self.view setNeedsUpdateConstraints];
-            [self.view layoutIfNeeded];
-
-            [self jsq_updateCollectionViewInsets];
-
-            if (self.automaticallyScrollsToMostRecentMessage) {
-                [self scrollToBottomAnimated:NO];
-            }
-            
-            [self.inputToolbar toggleSendButtonEnabled];
         }
     }
+}
+
+- (void)searchResultsContainerViewVisible:(BOOL)visible {
+    CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
+    CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
+
+    CGFloat oldOffset = self.inputToolbar.contentView.searchResultsContainerView.hidden ? hiddenHeight : visibleHeight;
+    CGFloat newOffset = visible ? visibleHeight : hiddenHeight;
+
+    CGFloat dy = newOffset - oldOffset;
+
+    if (visible) {
+        self.inputToolbar.contentView.searchResultsContainerView.hidden = NO;
+    }
+
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        [self jsq_adjustInputToolbarHeightConstraintByDelta:dy];
+        [self jsq_updateKeyboardTriggerPoint];
+
+        [self jsq_updateCollectionViewInsets];
+    } completion:^(BOOL finished) {
+        if (!visible) {
+            self.inputToolbar.contentView.searchResultsContainerView.hidden = YES;
+        }
+
+        [self searchResultsContainerViewChanged];
+    }];
+
+}
+
+- (void)searchResultsContainerViewChanged {
+    if (self.automaticallyScrollsToMostRecentMessage) {
+        [self scrollToBottomAnimated:NO];
+    }
+
+    [self.inputToolbar toggleSendButtonEnabled];
 }
 
 #pragma mark - Keyboard controller delegate
@@ -1176,11 +1179,6 @@ JSQMessagesKeyboardControllerDelegate>
                                                 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
                                                 context:kJSQMessagesKeyValueObservingContext];
 
-    [self.inputToolbar.contentView.searchResultsContainerView addObserver:self
-                                                               forKeyPath:@"hidden"
-                                                                  options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-                                                                  context:kJSQMessagesKeyValueObservingContext];
-
     self.jsq_isObserving = YES;
 }
 
@@ -1193,9 +1191,6 @@ JSQMessagesKeyboardControllerDelegate>
     @try {
         [_inputToolbar.contentView.textView removeObserver:self
                                                 forKeyPath:NSStringFromSelector(@selector(contentSize))
-                                                   context:kJSQMessagesKeyValueObservingContext];
-        [_inputToolbar.contentView.searchResultsContainerView removeObserver:self
-                                                forKeyPath:@"hidden"
                                                    context:kJSQMessagesKeyValueObservingContext];
     }
     @catch (NSException * __unused exception) { }

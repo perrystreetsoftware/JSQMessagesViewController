@@ -351,29 +351,27 @@
 
 - (void)didPressAccessoryButton:(UIButton *)sender
 {
-    if (self.inputToolbar.contentView.searchResultsContainerViewHidden) {
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
-        label.text = @"Test";
-        label.numberOfLines = 0;
-        label.backgroundColor = [UIColor orangeColor];
-        label.translatesAutoresizingMaskIntoConstraints = NO;
-        self.inputToolbar.contentView.searchResultsContainerView.translatesAutoresizingMaskIntoConstraints = NO;
+    if (self.inputToolbar.contentView.searchResultsContainerView.hidden) {
+        if (self.inputToolbar.contentView.searchResultsContainerView.subviews.count == 0) {
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
+            label.text = @"Test";
+            label.numberOfLines = 0;
+            label.backgroundColor = [UIColor orangeColor];
+            label.translatesAutoresizingMaskIntoConstraints = NO;
+            self.inputToolbar.contentView.searchResultsContainerView.translatesAutoresizingMaskIntoConstraints = NO;
 
-        NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(label);
+            NSDictionary *viewsDictionary = NSDictionaryOfVariableBindings(label);
 
-        [self.inputToolbar.contentView.searchResultsContainerView addSubview:label];
-        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[label]|" options:0 metrics:0 views:viewsDictionary]];
-        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[label]|" options:0 metrics:0 views:viewsDictionary]];
-        
-        [self.view layoutIfNeeded];
-
-        self.inputToolbar.contentView.searchResultsContainerViewHidden = NO;
-    } else {
-        self.inputToolbar.contentView.searchResultsContainerViewHidden = YES;
-
-        for (UIView *v in self.inputToolbar.contentView.searchResultsContainerView.subviews) {
-            [v removeFromSuperview];
+            [self.inputToolbar.contentView.searchResultsContainerView addSubview:label];
+            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[label]|" options:0 metrics:0 views:viewsDictionary]];
+            [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[label]|" options:0 metrics:0 views:viewsDictionary]];
+            
+            [self.view layoutIfNeeded];
         }
+
+        [self searchResultsContainerViewVisible:YES];
+    } else {
+        [self searchResultsContainerViewVisible:NO];
     }
 }
 

@@ -364,5 +364,7 @@
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard;
 
 - (NSString *)jsq_currentlyComposedMessageText;
+- (void)searchResultsContainerViewVisible:(BOOL)visible;
+- (void)searchResultsContainerViewChanged;
 
 @end
