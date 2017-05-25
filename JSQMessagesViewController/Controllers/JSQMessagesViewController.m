@@ -947,10 +947,12 @@ JSQMessagesKeyboardControllerDelegate>
     [UIView animateWithDuration:kSearchResultsContainerViewTransitionDuration
                           delay:0
                         options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self jsq_adjustInputToolbarHeightConstraintByDelta:dy];
-        [self jsq_updateKeyboardTriggerPoint];
+                            [self jsq_adjustInputToolbarHeightConstraintByDelta:dy];
+                            [self jsq_updateKeyboardTriggerPoint];
 
-        [self jsq_updateCollectionViewInsets];
+                            [self jsq_updateCollectionViewInsets];
+
+                            self.collectionView.contentOffset = CGPointMake(0, [self requiredScrollOffsetToBeAtBottom]);
     } completion:^(BOOL finished) {
         if (!visible) {
             self.inputToolbar.contentView.searchResultsContainerView.hidden = YES;
@@ -959,6 +961,15 @@ JSQMessagesKeyboardControllerDelegate>
         [self searchResultsContainerViewChanged];
     }];
 
+}
+
+- (CGFloat)requiredScrollOffsetToBeAtBottom {
+    float scrollViewHeight = self.collectionView.frame.size.height;
+    float scrollContentSizeHeight = self.collectionView.contentSize.height;
+//    float scrollOffset = self.collectionView.contentOffset.y;
+    float scrollInset = self.collectionView.contentInset.bottom;
+
+    return scrollContentSizeHeight + scrollInset - scrollViewHeight;
 }
 
 - (void)searchResultsContainerViewChanged {
