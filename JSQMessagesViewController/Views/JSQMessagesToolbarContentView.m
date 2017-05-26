@@ -200,7 +200,13 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
 - (void)setIsRightBarButtonItemHidden:(BOOL)isRightBarButtonItemHidden {
     _isRightBarButtonItemHidden = isRightBarButtonItemHidden;
 
-    self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+    self.rightBarButtonContainerView.hidden = NO;
+
+    [UIView animateWithDuration:0.25 delay:0 options:0 animations:^{
+        self.rightBarButtonContainerView.alpha = isRightBarButtonItemHidden ? 0 : 1;
+    } completion:^(BOOL finished) {
+        self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+    }];
 }
 
 - (CGFloat)hiddenTopOffsetConstraintValue {
