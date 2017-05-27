@@ -113,6 +113,13 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
 
 @property (assign, nonatomic) BOOL isRightBarButtonItemHidden;
 
+// SCRUFF Additions
+@property (weak, nonatomic) IBOutlet UIView *searchResultsContainerView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *searchResultsContainerViewHeightConstraint;
+@property (readonly, nonatomic) CGFloat visibleTopOffsetConstraintValue;
+@property (readonly, nonatomic) CGFloat hiddenTopOffsetConstraintValue;
+@property (readonly, nonatomic) CGFloat searchResultsContainerViewContentHeight;
+
 #pragma mark - Class methods
 
 /**

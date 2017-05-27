@@ -98,6 +98,9 @@
  */
 - (void)toggleSendButtonEnabled;
 
+// SCRUFF addition
+- (void)toggleSendButtonEnabled:(BOOL)searchResultsContainerVisible;
+
 /**
  *  Loads the content view for the toolbar.
  *

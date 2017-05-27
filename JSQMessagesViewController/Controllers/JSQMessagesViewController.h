@@ -363,4 +363,11 @@
  */
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard;
 
+// SCRUFF additions -- support for searchResultsContainerView
+@property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
+
+- (NSString *)jsq_currentlyComposedMessageText;
+- (void)toggleSearchResultsContainerViewVisible;
+- (void)searchResultsContainerViewChanged;
+
 @end

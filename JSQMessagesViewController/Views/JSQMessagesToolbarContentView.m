@@ -19,8 +19,10 @@
 #import "JSQMessagesToolbarContentView.h"
 
 #import "UIView+JSQMessages.h"
+#import <pop/POP.h>
 
 const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
+const CGFloat kSendButtonAnimationDuration = 0.2f;
 
 
 @interface JSQMessagesToolbarContentView ()
@@ -35,6 +37,8 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftHorizontalSpacingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *rightHorizontalSpacingConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topOffsetMarginConstraint;
 
 @end
 
@@ -57,6 +61,9 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
     [super awakeFromNib];
 
     [self setTranslatesAutoresizingMaskIntoConstraints:NO];
+
+    self.searchResultsContainerView.backgroundColor = [UIColor clearColor];
+    self.searchResultsContainerViewHeightConstraint.constant = 0;
 
     self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
     self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
@@ -194,7 +201,39 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
 - (void)setIsRightBarButtonItemHidden:(BOOL)isRightBarButtonItemHidden {
     _isRightBarButtonItemHidden = isRightBarButtonItemHidden;
 
-    self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+    self.rightBarButtonContainerView.hidden = NO;
+
+    POPBasicAnimation *animation = [POPBasicAnimation animation];
+    animation.duration = kSendButtonAnimationDuration;
+    animation.property = [POPAnimatableProperty propertyWithName:kPOPViewAlpha];
+    animation.toValue = isRightBarButtonItemHidden ? @(0) : @(1);
+    [self.rightBarButtonContainerView pop_addAnimation:animation forKey:@"self.rightBarButtonContainerView.alpha"];
+    [animation setCompletionBlock:^(POPAnimation *a, BOOL done) {
+        if (done) {
+            self.rightBarButtonContainerView.hidden = isRightBarButtonItemHidden;
+        }
+    }];
+}
+
+- (CGFloat)searchResultsContainerViewContentHeight {
+    if (self.searchResultsContainerView.subviews.count > 0) {
+
+        CGSize preferredSize = [self.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+
+        return preferredSize.height;
+    }
+
+    return 0;
+}
+
+- (CGFloat)hiddenTopOffsetConstraintValue {
+    return self.topOffsetMarginConstraint.constant;
+}
+
+- (CGFloat)visibleTopOffsetConstraintValue {
+    CGFloat height = [self searchResultsContainerViewContentHeight];
+
+    return height + 2 * self.topOffsetMarginConstraint.constant;
 }
 
 @end

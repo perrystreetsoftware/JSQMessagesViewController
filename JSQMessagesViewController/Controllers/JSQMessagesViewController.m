@@ -40,7 +40,7 @@
 #import "NSBundle+JSQMessages.h"
 
 #import <objc/runtime.h>
-
+#import <pop/POP.h>
 
 // Fixes rdar://26295020
 // See issue #1247 and Peter Steinberger's comment:
@@ -117,7 +117,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObservingContext;
 
-
+static const CGFloat kSearchBarAnimationDuration = 0.2;
 
 @interface JSQMessagesViewController () <JSQMessagesInputToolbarDelegate,
 JSQMessagesKeyboardControllerDelegate>
@@ -839,6 +839,7 @@ JSQMessagesKeyboardControllerDelegate>
     }
 
     [self.inputToolbar toggleSendButtonEnabled];
+    [self deliverTextViewChangedEventsToSearchResultsView:textView];
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
@@ -1265,6 +1266,162 @@ JSQMessagesKeyboardControllerDelegate>
 // Override in subclass to change the ad height
 - (CGFloat)targetAdHeight {
     return 44.0;
+}
+
+#pragma mark - SCRUFF Additions for searchResultsContainerView
+
+- (void)toggleSearchResultsContainerViewVisible {
+    BOOL visible = !self.isSearchResultsContainerViewVisible;
+
+    CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
+    CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
+
+    CGFloat oldOffset = self.isSearchResultsContainerViewVisible ? visibleHeight : hiddenHeight;
+    CGFloat newOffset = visible ? visibleHeight : hiddenHeight;
+
+    CGFloat dy = newOffset - oldOffset;
+
+    // Because this constraint could be in the middle of changing, we cannot trust
+    // its current value if we are in the middle of an animation
+    // Instead, we have to go to the animation to obtain what it's true value is
+    CGFloat postAnimationHeight = self.toolbarHeightConstraint.constant;
+    POPBasicAnimation *a1 = [self.toolbarHeightConstraint pop_animationForKey:@"self.toolbarHeightConstraint"];
+
+    if (a1) {
+        postAnimationHeight = [a1.toValue floatValue];
+    }
+
+    a1 = [POPBasicAnimation easeOutAnimation];
+    a1.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
+    a1.toValue = @([self jsq_computeInputToolbarHeightConstraintByDelta:dy
+                                                    postAnimationHeight:postAnimationHeight]);
+    a1.duration = kSearchBarAnimationDuration;
+    [a1 setCompletionBlock:^(POPAnimation *a, BOOL done) {
+        if (done) {
+            [self jsq_updateKeyboardTriggerPoint];
+            [self searchResultsContainerViewChanged];
+        }
+    }];
+
+    [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
+
+    UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:dy];
+    POPBasicAnimation *a2 = [self.toolbarHeightConstraint pop_animationForKey:@"collectionView kPOPScrollViewContentInset"];
+    a2 = [POPBasicAnimation easeOutAnimation];
+    a2.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
+    a2.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
+    a2.duration = kSearchBarAnimationDuration;
+
+    [self.collectionView pop_addAnimation:a2 forKey:@"collectionView kPOPScrollViewContentInset"];
+
+    POPBasicAnimation *a3 = [POPBasicAnimation easeOutAnimation];
+    a3.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewScrollIndicatorInsets];
+    a3.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
+    a3.duration = kSearchBarAnimationDuration;
+
+    [self.collectionView pop_addAnimation:a3 forKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
+
+    POPBasicAnimation *a4 = [POPBasicAnimation easeOutAnimation];
+    a4.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
+    a4.toValue = visible ? @(self.inputToolbar.contentView.searchResultsContainerViewContentHeight) : @(0);
+    a4.duration = kSearchBarAnimationDuration;
+    [self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint pop_addAnimation:a4 forKey:@"searchResultsContainerViewHeightConstraint"];
+
+    CGFloat availableContentDisplayHeight = self.collectionView.frame.size.height -
+        finalEdgeInsetsAfterCurrentAnimation.bottom - finalEdgeInsetsAfterCurrentAnimation.top;
+
+    if (self.collectionView.contentSize.height > availableContentDisplayHeight) {
+        POPBasicAnimation *a5 = [POPBasicAnimation easeOutAnimation];
+        a5.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentOffset];
+        a5.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy
+                                                                                         finalInsets:finalEdgeInsetsAfterCurrentAnimation])];
+        a5.duration = kSearchBarAnimationDuration;
+
+        [self.collectionView pop_addAnimation:a5 forKey:@"collectionView kPOPScrollViewContentOffset"];
+    }
+
+    [self.inputToolbar toggleSendButtonEnabled:visible];
+    self.isSearchResultsContainerViewVisible = visible;
+}
+
+- (void)searchResultsContainerViewChanged {
+    if (self.automaticallyScrollsToMostRecentMessage) {
+        [self scrollToBottomAnimated:NO];
+    }
+}
+
+- (CGFloat)computeTopYOffsetOfInputToolbar {
+    CGFloat topYOffset = 0;
+
+    CGRect frameOfSearchResultsContainer =
+    [self.view convertRect:self.inputToolbar.contentView.searchResultsContainerView.frame
+                  fromView:self.inputToolbar.contentView];
+    CGFloat bottomYOffsetOfSearchResultsContainer = CGRectGetMaxY(frameOfSearchResultsContainer);
+
+    if (self.inputToolbar.isHidden) {
+        topYOffset = CGRectGetMinY(self.pickerToolbar.frame);
+    } else if (self.isSearchResultsContainerViewVisible) {
+        CGFloat heightOfSearchResultsContainerContent = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+
+        topYOffset = bottomYOffsetOfSearchResultsContainer - heightOfSearchResultsContainerContent;
+    } else {
+        topYOffset = bottomYOffsetOfSearchResultsContainer;
+    }
+
+    return topYOffset;
+}
+
+- (UIEdgeInsets)jsq_computeCollectionViewInsets:(CGFloat)dy
+{
+    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - [self computeTopYOffsetOfInputToolbar];
+    CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
+
+    self.adContainerHeightConstraint.constant = adContainerInset;
+
+    UIEdgeInsets insets = UIEdgeInsetsMake(self.topLayoutGuide.length + self.topContentAdditionalInset, 0.0f, defaultBottomInset + adContainerInset + dy, 0.0f);
+
+    return insets;
+}
+
+- (CGFloat)jsq_computeInputToolbarHeightConstraintByDelta:(CGFloat)dy
+                                      postAnimationHeight:(CGFloat)postAnimationHeight {
+
+    CGFloat proposedHeight = postAnimationHeight + dy;
+
+    CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight);
+
+    if (self.inputToolbar.maximumHeight != NSNotFound) {
+        finalHeight = MIN(finalHeight, self.inputToolbar.maximumHeight);
+    }
+
+    if (postAnimationHeight != finalHeight) {
+        return finalHeight;
+
+    }
+
+    return 0;
+}
+
+- (CGFloat)requiredScrollOffsetToBeAtBottom:(CGFloat)dy finalInsets:(UIEdgeInsets)finalEdgeInsetsAfterCurrentAnimation {
+    float scrollViewHeight = self.collectionView.frame.size.height;
+    float scrollContentSizeHeight = self.collectionView.contentSize.height;
+    //    float scrollOffset = self.collectionView.contentOffset.y;
+    float scrollInset = finalEdgeInsetsAfterCurrentAnimation.bottom;
+
+    return scrollContentSizeHeight + scrollInset - scrollViewHeight;
+}
+
+- (void)deliverTextViewChangedEventsToSearchResultsView:(UITextView *)textView {
+    if (self.isSearchResultsContainerViewVisible) {
+        if (self.inputToolbar.contentView.searchResultsContainerView.subviews.count > 0) {
+            UIView *subview = self.inputToolbar.contentView.searchResultsContainerView.subviews[0];
+
+            if (subview &&
+                [subview respondsToSelector:@selector(textViewDidChange:)]) {
+                [subview performSelectorOnMainThread:@selector(textViewDidChange:) withObject:textView waitUntilDone:NO];
+            }
+        }
+    }
 }
 
 @end

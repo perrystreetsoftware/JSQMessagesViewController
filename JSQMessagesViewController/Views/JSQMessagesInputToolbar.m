@@ -105,13 +105,17 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 
 #pragma mark - Input toolbar
 
-- (void)toggleSendButtonEnabled
+- (void)toggleSendButtonEnabled {
+    [self toggleSendButtonEnabled:(self.contentView.searchResultsContainerView.frame.size.height > 0)];
+}
+
+- (void)toggleSendButtonEnabled:(BOOL)searchResultsContainerVisible
 {
     BOOL hasText = [self.contentView.textView hasText];
 
     if (self.sendButtonOnRight) {
         // Show/hide the send button instead of dimming it
-        self.contentView.isRightBarButtonItemHidden = !hasText;
+        self.contentView.isRightBarButtonItemHidden = (!hasText || searchResultsContainerVisible);
     }
     else {
         self.contentView.leftBarButtonItem.enabled = hasText;
