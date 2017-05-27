@@ -366,5 +366,6 @@
 - (NSString *)jsq_currentlyComposedMessageText;
 - (void)toggleSearchResultsContainerViewVisible;
 - (void)searchResultsContainerViewChanged;
+@property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
 
 @end

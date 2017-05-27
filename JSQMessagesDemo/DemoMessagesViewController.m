@@ -351,7 +351,7 @@
 
 - (void)didPressAccessoryButton:(UIButton *)sender
 {
-    if (self.inputToolbar.contentView.searchResultsContainerView.hidden) {
+    if (!self.isSearchResultsContainerViewVisible) {
         if (self.inputToolbar.contentView.searchResultsContainerView.subviews.count == 0) {
             UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
             label.text = @"Test";

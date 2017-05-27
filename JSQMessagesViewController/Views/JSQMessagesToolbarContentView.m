@@ -62,7 +62,6 @@ const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault = 8.0f;
     [self setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     self.searchResultsContainerView.backgroundColor = [UIColor clearColor];
-    self.searchResultsContainerView.hidden = YES;
 
     self.leftHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
     self.rightHorizontalSpacingConstraint.constant = kJSQMessagesToolbarContentViewHorizontalSpacingDefault;

@@ -137,7 +137,6 @@ JSQMessagesKeyboardControllerDelegate>
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *adContainerHeightConstraint;
 
 @property (assign, nonatomic) BOOL isAdVisible;
-@property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
 
 @property (weak, nonatomic) UIView *snapshotView;
 
@@ -947,7 +946,7 @@ JSQMessagesKeyboardControllerDelegate>
     CGFloat dy = newOffset - oldOffset;
 
 //    if (visible) {
-        self.inputToolbar.contentView.searchResultsContainerView.hidden = NO;
+//        self.inputToolbar.contentView.searchResultsContainerView.hidden = NO;
 //    }
 
     CGFloat finalHeightAfterCurrentAnimation = self.toolbarHeightConstraint.constant;
@@ -958,6 +957,15 @@ JSQMessagesKeyboardControllerDelegate>
         finalHeightAfterCurrentAnimation = [a1.toValue floatValue];
     }
 
+
+    UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:dy];
+
+    POPBasicAnimation *a2 = [self.toolbarHeightConstraint pop_animationForKey:@"collectionView kPOPScrollViewContentInset"];
+
+    if (a2) {
+        finalEdgeInsetsAfterCurrentAnimation = [a2.toValue UIEdgeInsetsValue];
+    }
+
     a1 = [POPBasicAnimation easeOutAnimation];
     a1.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
     a1.toValue = @([self jsq_computeInputToolbarHeightConstraintByDelta:dy finalHeight:finalHeightAfterCurrentAnimation]);
@@ -965,25 +973,23 @@ JSQMessagesKeyboardControllerDelegate>
 
     [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
 
-    UIEdgeInsets edgeInsets = [self jsq_computeCollectionViewInsets:dy];
-    NSLog(@"Insets are %@", NSStringFromUIEdgeInsets(edgeInsets));
-    POPBasicAnimation *a2 = [POPBasicAnimation easeOutAnimation];
+    a2 = [POPBasicAnimation easeOutAnimation];
     a2.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
-    a2.toValue = [NSValue valueWithUIEdgeInsets:edgeInsets];
+    a2.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
     a2.duration = kSearchBarAnimationDuration;
 
     [self.collectionView pop_addAnimation:a2 forKey:@"collectionView kPOPScrollViewContentInset"];
 
     POPBasicAnimation *a3 = [POPBasicAnimation easeOutAnimation];
     a3.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewScrollIndicatorInsets];
-    a3.toValue = [NSValue valueWithUIEdgeInsets:edgeInsets];
+    a3.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
     a3.duration = kSearchBarAnimationDuration;
 
     [self.collectionView pop_addAnimation:a3 forKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
 
     POPBasicAnimation *a4 = [POPBasicAnimation easeOutAnimation];
     a4.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentOffset];
-    a4.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy])];
+    a4.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy finalInsets:finalEdgeInsetsAfterCurrentAnimation])];
     a4.duration = kSearchBarAnimationDuration;
 
     [self.collectionView pop_addAnimation:a4 forKey:@"collectionView kPOPScrollViewContentOffset"];
@@ -1018,11 +1024,11 @@ JSQMessagesKeyboardControllerDelegate>
 
 }
 
-- (CGFloat)requiredScrollOffsetToBeAtBottom:(CGFloat)dy {
+- (CGFloat)requiredScrollOffsetToBeAtBottom:(CGFloat)dy finalInsets:(UIEdgeInsets)finalEdgeInsetsAfterCurrentAnimation {
     float scrollViewHeight = self.collectionView.frame.size.height;
     float scrollContentSizeHeight = self.collectionView.contentSize.height;
 //    float scrollOffset = self.collectionView.contentOffset.y;
-    float scrollInset = self.collectionView.contentInset.bottom + dy;
+    float scrollInset = finalEdgeInsetsAfterCurrentAnimation.bottom;
 
     return scrollContentSizeHeight + scrollInset - scrollViewHeight;
 }
@@ -1220,12 +1226,19 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (UIEdgeInsets)jsq_computeCollectionViewInsets:(CGFloat)dy
 {
-    CGRect bottomFrame = self.inputToolbar.isHidden ? self.pickerToolbar.frame : self.inputToolbar.frame;
-    //NSLog(@"Default bottom %@, adContainer %@, dy %@", @(defaultBottomInset), @(adContainerInset), @(dy));
+    CGFloat bottomFrameMinY = 0;
+    CGRect frameOfSearchResultsContainer = [self.view convertRect:self.inputToolbar.contentView.searchResultsContainerView.frame fromView:self.inputToolbar.contentView];
 
-    CGSize targetSize = [self.inputToolbar systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
-    NSLog(@"Target size is %@", NSStringFromCGSize(targetSize));
-    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(bottomFrame);
+    if (self.inputToolbar.isHidden){
+        bottomFrameMinY = CGRectGetMinY(self.pickerToolbar.frame);
+    } else if (self.isSearchResultsContainerViewVisible) {
+        bottomFrameMinY = CGRectGetMaxY(frameOfSearchResultsContainer) -
+        [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    } else {
+        bottomFrameMinY = CGRectGetMaxY(frameOfSearchResultsContainer);
+    }
+
+    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - bottomFrameMinY;
 
     CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
 
