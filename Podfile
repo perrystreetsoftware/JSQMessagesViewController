@@ -7,6 +7,10 @@ inhibit_all_warnings!
 
 pod 'JSQSystemSoundPlayer', '~> 2.0'
 
-target :JSQMessagesTests, :exclusive => true do
+target :JSQMessagesTests do
    pod 'JSQSystemSoundPlayer', '~> 2.0'
+end
+
+target :JSQMessages do
+   pod 'pop', '~> 1.0'
 end
