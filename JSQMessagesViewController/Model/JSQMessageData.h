@@ -97,4 +97,7 @@
  */
 - (id<JSQMessageMediaData>)media;
 
+- (UIFont *)preferredFont;
+- (UIEdgeInsets)preferredEdgeInsets;
+
 @end

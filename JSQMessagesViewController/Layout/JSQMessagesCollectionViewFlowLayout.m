@@ -45,6 +45,7 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
 @property (strong, nonatomic) NSMutableSet *visibleIndexPaths;
 
 @property (assign, nonatomic) CGFloat latestDelta;
+@property (assign, nonatomic) UIEdgeInsets defaultMessageBubbleTextViewTextContainerInsets;
 
 @end
 
@@ -64,7 +65,7 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     self.sectionInset = UIEdgeInsetsMake(10.0f, 4.0f, 10.0f, 4.0f);
     self.minimumLineSpacing = 4.0f;
     
-    _messageBubbleFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    // _messageBubbleFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     
     if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         _messageBubbleLeftRightMargin = 240.0f;
@@ -74,7 +75,7 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     }
     
     _messageBubbleTextViewFrameInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 6.0f);
-    _messageBubbleTextViewTextContainerInsets = UIEdgeInsetsMake(7.0f, 14.0f, 7.0f, 14.0f);
+    self.defaultMessageBubbleTextViewTextContainerInsets = UIEdgeInsetsMake(7.0f, 14.0f, 7.0f, 14.0f);
     
     CGSize defaultAvatarSize = CGSizeMake(kJSQMessagesCollectionViewAvatarSizeDefault, kJSQMessagesCollectionViewAvatarSizeDefault);
     _incomingAvatarViewSize = defaultAvatarSize;
@@ -147,16 +148,16 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
 }
 
-- (void)setMessageBubbleFont:(UIFont *)messageBubbleFont
-{
-    if ([_messageBubbleFont isEqual:messageBubbleFont]) {
-        return;
-    }
-    
-    NSParameterAssert(messageBubbleFont != nil);
-    _messageBubbleFont = messageBubbleFont;
-    [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
-}
+//- (void)setMessageBubbleFont:(UIFont *)messageBubbleFont
+//{
+//    if ([_messageBubbleFont isEqual:messageBubbleFont]) {
+//        return;
+//    }
+//    
+//    NSParameterAssert(messageBubbleFont != nil);
+//    _messageBubbleFont = messageBubbleFont;
+//    [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
+//}
 
 - (void)setMessageBubbleLeftRightMargin:(CGFloat)messageBubbleLeftRightMargin
 {
@@ -165,15 +166,15 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
 }
 
-- (void)setMessageBubbleTextViewTextContainerInsets:(UIEdgeInsets)messageBubbleTextContainerInsets
-{
-    if (UIEdgeInsetsEqualToEdgeInsets(_messageBubbleTextViewTextContainerInsets, messageBubbleTextContainerInsets)) {
-        return;
-    }
-    
-    _messageBubbleTextViewTextContainerInsets = messageBubbleTextContainerInsets;
-    [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
-}
+//- (void)setMessageBubbleTextViewTextContainerInsets:(UIEdgeInsets)messageBubbleTextContainerInsets
+//{
+//    if (UIEdgeInsetsEqualToEdgeInsets(_messageBubbleTextViewTextContainerInsets, messageBubbleTextContainerInsets)) {
+//        return;
+//    }
+//    
+//    _messageBubbleTextViewTextContainerInsets = messageBubbleTextContainerInsets;
+//    [self invalidateLayoutWithContext:[JSQMessagesCollectionViewFlowLayoutInvalidationContext context]];
+//}
 
 - (void)setIncomingAvatarViewSize:(CGSize)incomingAvatarViewSize
 {
@@ -412,6 +413,41 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
 
 #pragma mark - Message cell layout utilities
 
+- (UIEdgeInsets)messageBubbleTextViewTextContainerInsetsForItemAtIndexPath:(NSIndexPath *)indexPath {
+    id<JSQMessageData> messageItem = [self.collectionView.dataSource collectionView:self.collectionView
+                                                      messageDataForItemAtIndexPath:indexPath];
+
+    UIEdgeInsets preferredEdgeInsets = UIEdgeInsetsZero;
+
+    if ([messageItem respondsToSelector:@selector(preferredEdgeInsets)]) {
+        preferredEdgeInsets = [messageItem preferredEdgeInsets];
+    }
+
+    if (UIEdgeInsetsEqualToEdgeInsets(preferredEdgeInsets, UIEdgeInsetsZero)) {
+        preferredEdgeInsets = self.defaultMessageBubbleTextViewTextContainerInsets;
+    }
+
+    return preferredEdgeInsets;
+}
+
+- (UIFont *)messageBubbleFontForItemAtIndexPath:(NSIndexPath *)indexPath {
+    id<JSQMessageData> messageItem = [self.collectionView.dataSource collectionView:self.collectionView
+                                                      messageDataForItemAtIndexPath:indexPath];
+
+    UIFont *preferredFont = nil;
+
+    if ([messageItem respondsToSelector:@selector(preferredFont)]) {
+        preferredFont = [messageItem preferredFont];
+    }
+
+    if (!preferredFont) {
+        preferredFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    }
+
+    return preferredFont;
+}
+
+
 - (CGSize)messageBubbleSizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     id<JSQMessageData> messageItem = [self.collectionView.dataSource collectionView:self.collectionView
@@ -445,9 +481,9 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     
     layoutAttributes.textViewFrameInsets = self.messageBubbleTextViewFrameInsets;
     
-    layoutAttributes.textViewTextContainerInsets = self.messageBubbleTextViewTextContainerInsets;
+    layoutAttributes.textViewTextContainerInsets = [self messageBubbleTextViewTextContainerInsetsForItemAtIndexPath:indexPath];
     
-    layoutAttributes.messageBubbleFont = self.messageBubbleFont;
+    layoutAttributes.messageBubbleFont = [self messageBubbleFontForItemAtIndexPath:indexPath];
     
     layoutAttributes.incomingAvatarViewSize = self.incomingAvatarViewSize;
     

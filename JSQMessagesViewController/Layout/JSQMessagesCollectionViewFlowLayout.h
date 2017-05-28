@@ -102,7 +102,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
  *  
  *  @discussion The default value is the preferred system font for `UIFontTextStyleBody`. This value must not be `nil`.
  */
-@property (strong, nonatomic) UIFont *messageBubbleFont;
+- (UIFont *)messageBubbleFontForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  *  The horizontal spacing used to lay out the `messageBubbleContainerView` frame within each `JSQMessagesCollectionViewCell`.
@@ -162,7 +162,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
  *  Changing this value may also require you to manually calculate the itemSize for each cell
  *  in the layout by overriding the delegate method `collectionView:layout:sizeForItemAtIndexPath:`
  */
-@property (assign, nonatomic) UIEdgeInsets messageBubbleTextViewTextContainerInsets;
+- (UIEdgeInsets)messageBubbleTextViewTextContainerInsetsForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  *  The size of the avatar image view for incoming messages.

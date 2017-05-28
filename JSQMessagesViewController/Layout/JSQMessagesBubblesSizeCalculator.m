@@ -109,8 +109,9 @@
         CGSize avatarSize = [self jsq_avatarSizeForMessageData:messageData withLayout:layout];
 
         //  from the cell xibs, there is a 2 point space between avatar and bubble
+        UIEdgeInsets textViewTextContainerInsets = [layout messageBubbleTextViewTextContainerInsetsForItemAtIndexPath:indexPath];
         CGFloat spacingBetweenAvatarAndBubble = 2.0f;
-        CGFloat horizontalContainerInsets = layout.messageBubbleTextViewTextContainerInsets.left + layout.messageBubbleTextViewTextContainerInsets.right;
+        CGFloat horizontalContainerInsets = textViewTextContainerInsets.left + textViewTextContainerInsets.right;
         CGFloat horizontalFrameInsets = layout.messageBubbleTextViewFrameInsets.left + layout.messageBubbleTextViewFrameInsets.right;
 
         CGFloat horizontalInsetsTotal = horizontalContainerInsets + horizontalFrameInsets + spacingBetweenAvatarAndBubble;
@@ -118,12 +119,12 @@
 
         CGRect stringRect = [[messageData text] boundingRectWithSize:CGSizeMake(maximumTextWidth, CGFLOAT_MAX)
                                                              options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading)
-                                                          attributes:@{ NSFontAttributeName : layout.messageBubbleFont }
+                                                          attributes:@{ NSFontAttributeName : [layout messageBubbleFontForItemAtIndexPath:indexPath] }
                                                              context:nil];
 
         CGSize stringSize = CGRectIntegral(stringRect).size;
 
-        CGFloat verticalContainerInsets = layout.messageBubbleTextViewTextContainerInsets.top + layout.messageBubbleTextViewTextContainerInsets.bottom;
+        CGFloat verticalContainerInsets = textViewTextContainerInsets.top + textViewTextContainerInsets.bottom;
         CGFloat verticalFrameInsets = layout.messageBubbleTextViewFrameInsets.top + layout.messageBubbleTextViewFrameInsets.bottom;
 
         //  add extra 2 points of space (`self.additionalInset`), because `boundingRectWithSize:` is slightly off
