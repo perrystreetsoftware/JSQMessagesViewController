@@ -488,7 +488,8 @@ JSQMessagesKeyboardControllerDelegate>
     CGFloat maxHeightForVisibleMessage = CGRectGetHeight(self.collectionView.bounds)
                                          - self.collectionView.contentInset.top
                                          - self.collectionView.contentInset.bottom
-                                         - CGRectGetHeight(self.inputToolbar.bounds);
+                                         ;
+                                         // - CGRectGetHeight(self.inputToolbar.bounds);
     UICollectionViewScrollPosition scrollPosition = (cellSize.height > maxHeightForVisibleMessage) ? UICollectionViewScrollPositionBottom : UICollectionViewScrollPositionTop;
 
     [self.collectionView scrollToItemAtIndexPath:indexPath
@@ -1086,7 +1087,11 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_updateCollectionViewInsets
 {
-    CGRect bottomFrame = self.inputToolbar.isHidden ? self.pickerToolbar.frame : self.inputToolbar.frame;
+    // Input toolbar animates, so isHidden may not yet be updated
+    // when we are attempting to calculate insets
+
+    // isPickerViewVisible is updated immediately so we use that instead
+    CGRect bottomFrame = self.isPickerViewVisible ? self.pickerToolbar.frame : self.inputToolbar.frame;
 
     CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(bottomFrame);
 
@@ -1186,7 +1191,7 @@ JSQMessagesKeyboardControllerDelegate>
                                                            action:@selector(jsq_handleInteractivePopGestureRecognizer:)];
         self.currentInteractivePopGestureRecognizer = nil;
     }
-    
+
     if (addAction) {
         [self.navigationController.interactivePopGestureRecognizer addTarget:self
                                                                       action:@selector(jsq_handleInteractivePopGestureRecognizer:)];
@@ -1306,8 +1311,7 @@ JSQMessagesKeyboardControllerDelegate>
     [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
 
     UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:dy];
-    POPBasicAnimation *a2 = [self.toolbarHeightConstraint pop_animationForKey:@"collectionView kPOPScrollViewContentInset"];
-    a2 = [POPBasicAnimation easeOutAnimation];
+    POPBasicAnimation *a2 = [POPBasicAnimation easeOutAnimation];
     a2.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
     a2.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
     a2.duration = kSearchBarAnimationDuration;
@@ -1350,7 +1354,7 @@ JSQMessagesKeyboardControllerDelegate>
     }
 }
 
-- (CGFloat)computeTopYOffsetOfInputToolbar {
+- (CGFloat)computeTopYOffsetOfInputToolbar:(CGFloat)dy {
     CGFloat topYOffset = 0;
 
     CGRect frameOfSearchResultsContainer =
@@ -1358,8 +1362,8 @@ JSQMessagesKeyboardControllerDelegate>
                   fromView:self.inputToolbar.contentView];
     CGFloat bottomYOffsetOfSearchResultsContainer = CGRectGetMaxY(frameOfSearchResultsContainer);
 
-    if (self.inputToolbar.isHidden) {
-        topYOffset = CGRectGetMinY(self.pickerToolbar.frame);
+    if (self.isPickerViewVisible) {
+        topYOffset = CGRectGetMinY(self.pickerToolbar.frame) + dy;
     } else if (self.isSearchResultsContainerViewVisible) {
         CGFloat heightOfSearchResultsContainerContent = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
 
@@ -1373,7 +1377,7 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (UIEdgeInsets)jsq_computeCollectionViewInsets:(CGFloat)dy
 {
-    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - [self computeTopYOffsetOfInputToolbar];
+    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - [self computeTopYOffsetOfInputToolbar:dy];
     CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
 
     self.adContainerHeightConstraint.constant = adContainerInset;
