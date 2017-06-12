@@ -1255,7 +1255,7 @@ JSQMessagesKeyboardControllerDelegate>
         [self.inputToolbar setHidden:NO];
     }
 
-    [UIView animateWithDuration:0.25 animations:^{
+    [UIView animateWithDuration:kSearchBarAnimationDuration animations:^{
         if (hidden) {
             self.inputToolbar.transform = CGAffineTransformMakeTranslation(0.0, transformY);
         } else {
