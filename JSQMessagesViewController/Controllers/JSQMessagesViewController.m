@@ -934,17 +934,20 @@ JSQMessagesKeyboardControllerDelegate>
 
     heightFromBottom = MAX(0.0, heightFromBottom);
 
-    // Hide the picker view if the keyboard/input view is dismissed via the
-    // pan gesture recognizer
-
-    if (heightFromBottom == 0.0 && self.isPickerViewVisible) {
-        [self hidePickerViewShowingKeyboard:NO];
+    if (heightFromBottom == 0.0) {
+        // Alert subclasses if/when the pan gesture sets our k/b frame to zero
+        [self keyboardDidChangeFrameToZero];
     }
 
     // Show/hide the ad container view
     self.isAdVisible = heightFromBottom == 0.0;
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
+}
+
+- (void)keyboardDidChangeFrameToZero {
+    // Overridden in subclasses in case they want to adjust their
+    // input toolbars, etc
 }
 
 - (void)jsq_setToolbarBottomLayoutGuideConstant:(CGFloat)constant

@@ -362,6 +362,7 @@
  * @param showKeyboard Whether or not to show the keyboard after hiding.
  */
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard;
+- (void)keyboardDidChangeFrameToZero;
 
 // SCRUFF additions -- support for searchResultsContainerView
 @property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
