@@ -144,6 +144,7 @@ JSQMessagesKeyboardControllerDelegate>
 @property (weak, nonatomic) UIGestureRecognizer *currentInteractivePopGestureRecognizer;
 
 @property (assign, nonatomic) BOOL textViewWasFirstResponderDuringInteractivePop;
+@property (assign, nonatomic, getter=isReloadingInputViews) BOOL reloadingInputViews;
 
 @end
 
@@ -934,7 +935,7 @@ JSQMessagesKeyboardControllerDelegate>
 
     heightFromBottom = MAX(0.0, heightFromBottom);
 
-    if (heightFromBottom == 0.0) {
+    if (heightFromBottom == 0.0 && !self.isReloadingInputViews) {
         // Alert subclasses if/when the pan gesture sets our k/b frame to zero
         [self keyboardDidChangeFrameToZero];
     }
@@ -1214,7 +1215,14 @@ JSQMessagesKeyboardControllerDelegate>
     // the pickerView, which replaces the keyboard.
     self.inputToolbar.contentView.textView.inputView = self.pickerView;
 
+    // Our call to reloadInputViews causes the keyboard frame to
+    // temporarily go to 0.0 in iOS11
+    // Thus, we need to use this boolean value to avoid
+    // triggering the code that runs when we hide our keyboard because
+    // we tapped away or panned down
+    self.reloadingInputViews = YES;
     [self.inputToolbar.contentView.textView reloadInputViews];
+    self.reloadingInputViews = NO;
 
     // Make sure the textView is first responder so the keyboard - or in
     // this case the pickerView - becomes visible
@@ -1242,7 +1250,14 @@ JSQMessagesKeyboardControllerDelegate>
     // Show the input toolbar again
     [self setInputToolbarHidden:NO];
 
+    // Our call to reloadInputViews causes the keyboard frame to
+    // temporarily go to 0.0 in iOS11
+    // Thus, we need to use this boolean value to avoid
+    // triggering the code that runs when we hide our keyboard because
+    // we tapped away or panned down
+    self.reloadingInputViews = YES;
     [self.inputToolbar.contentView.textView reloadInputViews];
+    self.reloadingInputViews = NO;
 
     if (showKeyboard) {
         [self.inputToolbar.contentView.textView becomeFirstResponder];
