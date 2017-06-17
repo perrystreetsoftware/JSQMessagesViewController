@@ -144,7 +144,6 @@ JSQMessagesKeyboardControllerDelegate>
 @property (weak, nonatomic) UIGestureRecognizer *currentInteractivePopGestureRecognizer;
 
 @property (assign, nonatomic) BOOL textViewWasFirstResponderDuringInteractivePop;
-@property (assign, nonatomic, getter=isReloadingInputViews) BOOL reloadingInputViews;
 
 @end
 
@@ -935,18 +934,13 @@ JSQMessagesKeyboardControllerDelegate>
 
     heightFromBottom = MAX(0.0, heightFromBottom);
 
-    if (heightFromBottom == 0.0 && !self.isReloadingInputViews) {
-        // Alert subclasses if/when the pan gesture sets our k/b frame to zero
-        [self keyboardDidChangeFrameToZero];
-    }
-
     // Show/hide the ad container view
     self.isAdVisible = heightFromBottom == 0.0;
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
 
-- (void)keyboardDidChangeFrameToZero {
+- (void)keyboardDidHideAfterPan:(JSQMessagesKeyboardController *)keyboardController  {
     // Overridden in subclasses in case they want to adjust their
     // input toolbars, etc
 }
@@ -1095,10 +1089,15 @@ JSQMessagesKeyboardControllerDelegate>
     // when we are attempting to calculate insets
 
     // isPickerViewVisible is updated immediately so we use that instead
-    CGRect bottomFrame = self.isPickerViewVisible ? self.pickerToolbar.frame : self.inputToolbar.frame;
+    CGFloat topEdgeOfBottomWidget = 0;
 
-    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(bottomFrame);
+    if (self.isPickerViewVisible) {
+        topEdgeOfBottomWidget = CGRectGetMinY(self.pickerToolbar.frame);
+    } else {
+        topEdgeOfBottomWidget = CGRectGetMinY(self.inputToolbar.frame) - self.inputToolbar.transform.ty;
+    }
 
+    CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - topEdgeOfBottomWidget;
     CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
 
     self.adContainerHeightConstraint.constant = adContainerInset;
@@ -1215,14 +1214,7 @@ JSQMessagesKeyboardControllerDelegate>
     // the pickerView, which replaces the keyboard.
     self.inputToolbar.contentView.textView.inputView = self.pickerView;
 
-    // Our call to reloadInputViews causes the keyboard frame to
-    // temporarily go to 0.0 in iOS11
-    // Thus, we need to use this boolean value to avoid
-    // triggering the code that runs when we hide our keyboard because
-    // we tapped away or panned down
-    self.reloadingInputViews = YES;
     [self.inputToolbar.contentView.textView reloadInputViews];
-    self.reloadingInputViews = NO;
 
     // Make sure the textView is first responder so the keyboard - or in
     // this case the pickerView - becomes visible
@@ -1250,14 +1242,7 @@ JSQMessagesKeyboardControllerDelegate>
     // Show the input toolbar again
     [self setInputToolbarHidden:NO];
 
-    // Our call to reloadInputViews causes the keyboard frame to
-    // temporarily go to 0.0 in iOS11
-    // Thus, we need to use this boolean value to avoid
-    // triggering the code that runs when we hide our keyboard because
-    // we tapped away or panned down
-    self.reloadingInputViews = YES;
     [self.inputToolbar.contentView.textView reloadInputViews];
-    self.reloadingInputViews = NO;
 
     if (showKeyboard) {
         [self.inputToolbar.contentView.textView becomeFirstResponder];

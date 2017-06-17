@@ -59,6 +59,9 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
  */
 - (void)keyboardController:(JSQMessagesKeyboardController *)keyboardController keyboardDidChangeFrame:(CGRect)keyboardFrame;
 
+// SCRUFF/es added
+- (void)keyboardDidHideAfterPan:(JSQMessagesKeyboardController *)keyboardController;
+
 @end
 
 

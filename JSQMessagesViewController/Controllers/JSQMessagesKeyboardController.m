@@ -263,6 +263,8 @@ typedef void (^JSQAnimationCompletionBlock)(BOOL finished);
     [self jsq_setKeyboardViewHidden:YES];
     [self jsq_removeKeyboardFrameObserver];
     [self.textView resignFirstResponder];
+
+    [self.delegate keyboardDidHideAfterPan:self];
 }
 
 #pragma mark - Key-value observing
