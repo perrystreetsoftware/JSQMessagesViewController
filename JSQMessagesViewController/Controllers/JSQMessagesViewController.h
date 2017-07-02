@@ -367,7 +367,8 @@
 @property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
 
 - (NSString *)jsq_currentlyComposedMessageText;
-- (void)toggleSearchResultsContainerViewVisible;
+- (void)animateSearchResultsContainerViewVisible:(BOOL)visible;
 - (void)searchResultsContainerViewChanged;
+- (void)cancelContentSpecificAnimations;
 
 @end

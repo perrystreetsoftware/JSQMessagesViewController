@@ -285,6 +285,8 @@ JSQMessagesKeyboardControllerDelegate>
 
     [self jsq_configureMessagesViewController];
     [self jsq_registerForNotifications:YES];
+
+    self.toolbarHeightConstraint.constant = self.inputToolbar.preferredDefaultHeight;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -293,7 +295,6 @@ JSQMessagesKeyboardControllerDelegate>
     NSParameterAssert(self.senderDisplayName != nil);
 
     [super viewWillAppear:animated];
-    self.toolbarHeightConstraint.constant = self.inputToolbar.preferredDefaultHeight;
     [self.view layoutIfNeeded];
     [self.collectionView.collectionViewLayout invalidateLayout];
 
@@ -1278,14 +1279,18 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - SCRUFF Additions for searchResultsContainerView
 
-- (void)toggleSearchResultsContainerViewVisible {
-    BOOL visible = !self.isSearchResultsContainerViewVisible;
-
+- (void)animateSearchResultsContainerViewVisible:(BOOL)visible {
     CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
-    CGFloat visibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
 
-    CGFloat oldOffset = self.isSearchResultsContainerViewVisible ? visibleHeight : hiddenHeight;
-    CGFloat newOffset = visible ? visibleHeight : hiddenHeight;
+    // When this method is called, we have already swapped out the subview
+    // but have not necessarily resized the container
+    // targetVisibleHeight uses sizeFitting method to calculate optimal size for subview
+    // currentVisibleHeight looks at what the frame actually is right now
+    CGFloat targetVisibleHeight = self.inputToolbar.contentView.visibleTopOffsetConstraintValue;
+    CGFloat currentVisibleHeight = self.inputToolbar.contentView.searchResultsContainerView.frame.size.height;
+
+    CGFloat oldOffset = self.isSearchResultsContainerViewVisible ? currentVisibleHeight : hiddenHeight;
+    CGFloat newOffset = visible ? targetVisibleHeight : hiddenHeight;
 
     CGFloat dy = newOffset - oldOffset;
 
@@ -1351,6 +1356,14 @@ JSQMessagesKeyboardControllerDelegate>
     self.isSearchResultsContainerViewVisible = visible;
 }
 
+- (void)cancelContentSpecificAnimations {
+    // If the content in our dataSource changes, we need to stop whatever
+    // contentOffset animations we are doing because they could be wrong
+    for (NSString *anim in @[@"collectionView kPOPScrollViewContentOffset"]) {
+        [self.collectionView pop_removeAnimationForKey:anim];
+    }
+}
+
 - (void)searchResultsContainerViewChanged {
     if (self.automaticallyScrollsToMostRecentMessage) {
         [self scrollToBottomAnimated:NO];
@@ -1368,9 +1381,10 @@ JSQMessagesKeyboardControllerDelegate>
     if (self.isPickerViewVisible) {
         topYOffset = CGRectGetMinY(self.pickerToolbar.frame) + dy;
     } else if (self.isSearchResultsContainerViewVisible) {
-        CGFloat heightOfSearchResultsContainerContent = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+//        CGFloat targetHeightOfSearchResultsContainerContent = [self.inputToolbar.contentView.searchResultsContainerView.subviews[0] systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+        CGFloat currentHeightOfSearchResultsContainerContent = self.inputToolbar.contentView.searchResultsContainerView.frame.size.height;
 
-        topYOffset = bottomYOffsetOfSearchResultsContainer - heightOfSearchResultsContainerContent;
+        topYOffset = bottomYOffsetOfSearchResultsContainer - currentHeightOfSearchResultsContainerContent;
     } else {
         topYOffset = bottomYOffsetOfSearchResultsContainer;
     }
