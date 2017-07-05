@@ -100,6 +100,7 @@
 
 // SCRUFF addition
 - (void)toggleSendButtonEnabled:(BOOL)searchResultsContainerVisible;
+@property (nonatomic) BOOL searchResultsShouldBlockSendButton;
 
 /**
  *  Loads the content view for the toolbar.
