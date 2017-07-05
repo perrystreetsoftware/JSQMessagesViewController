@@ -366,6 +366,7 @@
 // SCRUFF additions -- support for searchResultsContainerView
 @property (assign, nonatomic) BOOL isSearchResultsContainerViewVisible;
 
+- (NSAttributedString *)jsq_currentlyComposedMessageAttributedText;
 - (NSString *)jsq_currentlyComposedMessageText;
 - (void)animateSearchResultsContainerViewVisible:(BOOL)visible;
 - (void)searchResultsContainerViewChanged;
