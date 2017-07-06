@@ -956,13 +956,7 @@ JSQMessagesKeyboardControllerDelegate>
 {
     self.toolbarBottomLayoutGuide.constant = constant;
     [self.view setNeedsUpdateConstraints];
-
-    // Without this line, this ends up adjusting the frames of our searchResultsContainer
-    // which causes unwanted animations in things like our FrequentPhrases UICollectionView
-    // implementation
-    [UIView performWithoutAnimation:^{
-        [self.view layoutIfNeeded];
-    }];
+    [self.view layoutIfNeeded];
 
     [self jsq_updateCollectionViewInsets];
     [self scrollToBottomAnimated:NO];
