@@ -182,4 +182,16 @@
                        withSender:sender];
 }
 
+- (void)messagesCollectionViewCellDidTapUnsend:(JSQMessagesCollectionViewCell *)cell {
+    NSIndexPath *indexPath = [self indexPathForCell:cell];
+    if (indexPath == nil) {
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(collectionView:didTapUnsendAtIndexPath:)]) {
+        [self.delegate collectionView:self
+              didTapUnsendAtIndexPath:indexPath];
+    }
+}
+
 @end

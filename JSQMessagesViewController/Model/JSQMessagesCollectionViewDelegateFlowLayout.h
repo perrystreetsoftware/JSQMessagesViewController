@@ -119,4 +119,9 @@
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView
                 header:(JSQMessagesLoadEarlierHeaderView *)headerView didTapLoadEarlierMessagesButton:(UIButton *)sender;
 
+@optional
+
+// SCRUFF addition
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapUnsendAtIndexPath:(NSIndexPath *)indexPath;
+
 @end

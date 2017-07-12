@@ -72,6 +72,9 @@
  */
 - (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didPerformAction:(SEL)action withSender:(id)sender;
 
+// SCRUFF addition
+- (void)messagesCollectionViewCellDidTapUnsend:(JSQMessagesCollectionViewCell *)cell;
+
 @end
 
 
