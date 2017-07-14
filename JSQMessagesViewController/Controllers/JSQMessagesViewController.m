@@ -1285,7 +1285,7 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - SCRUFF Additions for searchResultsContainerView
 
-- (void)animateSearchResultsContainerViewVisible:(BOOL)visible {
+- (void)searchResultsContainerViewVisible:(BOOL)visible animated:(BOOL)animated {
     CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
 
     // When this method is called, we have already swapped out the subview
@@ -1299,6 +1299,12 @@ JSQMessagesKeyboardControllerDelegate>
     CGFloat newOffset = visible ? targetVisibleHeight : hiddenHeight;
 
     CGFloat dy = newOffset - oldOffset;
+
+    // We need to adjust search container view before all else
+    POPBasicAnimation *a0 = [POPBasicAnimation easeOutAnimation];
+    a0.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
+    a0.toValue = visible ? @(self.inputToolbar.contentView.searchResultsContainerViewContentHeight) : @(0);
+    a0.duration = kSearchBarAnimationDuration;
 
     // Because this constraint could be in the middle of changing, we cannot trust
     // its current value if we are in the middle of an animation
@@ -1314,6 +1320,7 @@ JSQMessagesKeyboardControllerDelegate>
     a1.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
     a1.toValue = @([self jsq_computeInputToolbarHeightConstraintByDelta:dy
                                                     postAnimationHeight:postAnimationHeight]);
+
     a1.duration = kSearchBarAnimationDuration;
     [a1 setCompletionBlock:^(POPAnimation *a, BOOL done) {
         if (done) {
@@ -1322,7 +1329,13 @@ JSQMessagesKeyboardControllerDelegate>
         }
     }];
 
-    [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
+    if (animated) {
+        [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
+        [self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint pop_addAnimation:a0 forKey:@"searchResultsContainerViewHeightConstraint"];
+    } else {
+        self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint.constant = [a0.toValue floatValue];
+        self.toolbarHeightConstraint.constant = [a1.toValue floatValue];
+    }
 
     UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:dy];
     POPBasicAnimation *a2 = [POPBasicAnimation easeOutAnimation];
@@ -1339,23 +1352,17 @@ JSQMessagesKeyboardControllerDelegate>
 
     [self.collectionView pop_addAnimation:a3 forKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
 
-    POPBasicAnimation *a4 = [POPBasicAnimation easeOutAnimation];
-    a4.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
-    a4.toValue = visible ? @(self.inputToolbar.contentView.searchResultsContainerViewContentHeight) : @(0);
-    a4.duration = kSearchBarAnimationDuration;
-    [self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint pop_addAnimation:a4 forKey:@"searchResultsContainerViewHeightConstraint"];
-
     CGFloat availableContentDisplayHeight = self.collectionView.frame.size.height -
-        finalEdgeInsetsAfterCurrentAnimation.bottom - finalEdgeInsetsAfterCurrentAnimation.top;
+    finalEdgeInsetsAfterCurrentAnimation.bottom - finalEdgeInsetsAfterCurrentAnimation.top;
 
     if (self.collectionView.contentSize.height > availableContentDisplayHeight) {
-        POPBasicAnimation *a5 = [POPBasicAnimation easeOutAnimation];
-        a5.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentOffset];
-        a5.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy
+        POPBasicAnimation *a4 = [POPBasicAnimation easeOutAnimation];
+        a4.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentOffset];
+        a4.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy
                                                                                          finalInsets:finalEdgeInsetsAfterCurrentAnimation])];
-        a5.duration = kSearchBarAnimationDuration;
+        a4.duration = kSearchBarAnimationDuration;
 
-        [self.collectionView pop_addAnimation:a5 forKey:@"collectionView kPOPScrollViewContentOffset"];
+        [self.collectionView pop_addAnimation:a4 forKey:@"collectionView kPOPScrollViewContentOffset"];
     }
 
     [self.inputToolbar toggleSendButtonEnabled:visible];

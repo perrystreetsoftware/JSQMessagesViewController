@@ -369,9 +369,9 @@
             [self.view layoutIfNeeded];
         }
 
-        [self animateSearchResultsContainerViewVisible:YES];
+        [self searchResultsContainerViewVisible:YES animated:YES];
     } else {
-        [self animateSearchResultsContainerViewVisible:NO];
+        [self searchResultsContainerViewVisible:YES animated:NO];
     }
 }
 

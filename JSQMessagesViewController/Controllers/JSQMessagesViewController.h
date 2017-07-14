@@ -368,7 +368,7 @@
 
 - (NSAttributedString *)jsq_currentlyComposedMessageAttributedText;
 - (NSString *)jsq_currentlyComposedMessageText;
-- (void)animateSearchResultsContainerViewVisible:(BOOL)visible;
+- (void)searchResultsContainerViewVisible:(BOOL)visible animated:(BOOL)animated;
 - (void)searchResultsContainerViewChanged;
 - (void)cancelContentSpecificAnimations;
 
