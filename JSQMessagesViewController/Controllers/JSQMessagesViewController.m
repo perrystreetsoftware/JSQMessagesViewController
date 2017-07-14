@@ -145,6 +145,8 @@ JSQMessagesKeyboardControllerDelegate>
 
 @property (assign, nonatomic) BOOL textViewWasFirstResponderDuringInteractivePop;
 
+@property (nonatomic) BOOL transitioningSize;
+
 @end
 
 
@@ -373,6 +375,13 @@ JSQMessagesKeyboardControllerDelegate>
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [self jsq_resetLayoutAndCaches];
+
+    self.transitioningSize = YES;
+
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        self.transitioningSize = NO;
+    }];
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
@@ -863,7 +872,17 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_handleDidChangeStatusBarFrameNotification:(NSNotification *)notification
 {
-    if (self.keyboardController.keyboardIsVisible) {
+    // In sample project, we receive the keyboard hide/show notifications BEFORE
+    // the status bar frame notifications, which causes keyboardIsVisible to be NO
+    // during a rotation
+    //
+    // In other project, we receive the keyboard hide/show notification AFTER
+    // the status bar frame notification, which causes layout constraint violations
+    // during a rotation
+    //
+    // So, we cache when we are rotating because we never want to be updating
+    // these constraints in the middle of a rotation
+    if (self.keyboardController.keyboardIsVisible && !self.transitioningSize) {
         [self jsq_setToolbarBottomLayoutGuideConstant:CGRectGetHeight(self.keyboardController.currentKeyboardFrame)];
     }
 }
