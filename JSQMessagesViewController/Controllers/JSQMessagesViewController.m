@@ -117,7 +117,7 @@ static void JSQInstallWorkaroundForSheetPresentationIssue26295020(void) {
 
 static void * kJSQMessagesKeyValueObservingContext = &kJSQMessagesKeyValueObservingContext;
 
-static const CGFloat kSearchBarAnimationDuration = 0.2;
+const CGFloat kSearchBarAnimationDuration = 0.2;
 
 @interface JSQMessagesViewController () <JSQMessagesInputToolbarDelegate,
 JSQMessagesKeyboardControllerDelegate>
@@ -1073,7 +1073,14 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy
 {
-    CGFloat proposedHeight = self.toolbarHeightConstraint.constant + dy;
+    CGFloat toolbarHeightConstraintValue = self.toolbarHeightConstraint.constant;
+
+    POPBasicAnimation *a1 = [self.toolbarHeightConstraint pop_animationForKey:@"self.toolbarHeightConstraint"];
+    if (a1) {
+        toolbarHeightConstraintValue = [a1.toValue floatValue];
+    }
+
+    CGFloat proposedHeight = toolbarHeightConstraintValue + dy;
 
     CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight);
 
@@ -1081,8 +1088,14 @@ JSQMessagesKeyboardControllerDelegate>
         finalHeight = MIN(finalHeight, self.inputToolbar.maximumHeight);
     }
 
-    if (self.toolbarHeightConstraint.constant != finalHeight) {
-        self.toolbarHeightConstraint.constant = finalHeight;
+    if (toolbarHeightConstraintValue != finalHeight) {
+        if (a1) {
+            [self.toolbarHeightConstraint pop_removeAnimationForKey:@"self.toolbarHeightConstraint"];
+            a1.toValue = @(finalHeight);
+            [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
+        } else {
+            self.toolbarHeightConstraint.constant = finalHeight;
+        }
         [self.view setNeedsUpdateConstraints];
         [self.view layoutIfNeeded];
     }
