@@ -220,7 +220,7 @@ JSQMessagesKeyboardControllerDelegate>
 
     self.pickerView = [UIView new];
 
-    [self jsq_updateCollectionViewInsets];
+    [self jsq_updateCollectionViewInsetsAnimated:NO];
 
     // Don't set keyboardController if client creates custom content view via -loadToolbarContentView
     if (self.inputToolbar.contentView.textView != nil) {
@@ -272,9 +272,10 @@ JSQMessagesKeyboardControllerDelegate>
 }
 
 - (void)setTopContentAdditionalInset:(CGFloat)topContentAdditionalInset
+                            animated:(BOOL)animated
 {
     _topContentAdditionalInset = topContentAdditionalInset;
-    [self jsq_updateCollectionViewInsets];
+    [self jsq_updateCollectionViewInsetsAnimated:animated];
 }
 
 #pragma mark - View lifecycle
@@ -940,7 +941,7 @@ JSQMessagesKeyboardControllerDelegate>
             CGFloat dy = newContentSize.height - oldContentSize.height;
 
             [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy];
-            [self jsq_updateCollectionViewInsets];
+            [self jsq_updateCollectionViewInsetsAnimated:NO];
             if (self.automaticallyScrollsToMostRecentMessage) {
                 [self scrollToBottomAnimated:NO];
             }
@@ -977,7 +978,7 @@ JSQMessagesKeyboardControllerDelegate>
     [self.view setNeedsUpdateConstraints];
     [self.view layoutIfNeeded];
 
-    [self jsq_updateCollectionViewInsets];
+    [self jsq_updateCollectionViewInsetsAnimated:NO];
     [self scrollToBottomAnimated:NO];
 }
 
@@ -1122,7 +1123,7 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - Collection view utilities
 
-- (void)jsq_updateCollectionViewInsets
+- (void)jsq_updateCollectionViewInsetsAnimated:(BOOL)animated
 {
     // Input toolbar animates, so isHidden may not yet be updated
     // when we are attempting to calculate insets
@@ -1142,15 +1143,32 @@ JSQMessagesKeyboardControllerDelegate>
     self.adContainerHeightConstraint.constant = adContainerInset;
 
     [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
-                                  bottomValue:defaultBottomInset + adContainerInset];
+                                  bottomValue:defaultBottomInset + adContainerInset
+                                     animated:animated];
 
 
 }
 
-- (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top bottomValue:(CGFloat)bottom
+- (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top
+                                bottomValue:(CGFloat)bottom
+                                   animated:(BOOL)animated
 {
     UIEdgeInsets insets = UIEdgeInsetsMake(top, 0.0f, bottom, 0.0f);
-    self.collectionView.contentInset = insets;
+
+    if (animated) {
+        POPBasicAnimation *a0 = [POPBasicAnimation easeOutAnimation];
+        a0.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
+        a0.toValue = [NSValue valueWithUIEdgeInsets:insets];
+        a0.duration = kSearchBarAnimationDuration;
+
+        // KEY is important to ensure no collisions with other animations in this file
+        [self.collectionView pop_addAnimation:a0 forKey:@"collectionView kPOPScrollViewContentInset"];
+    } else {
+        [self.collectionView pop_removeAnimationForKey:@"collectionView kPOPScrollViewContentInset"];
+        self.collectionView.contentInset = insets;
+    }
+
+    // No one really sees these so no need to animate
     self.collectionView.scrollIndicatorInsets = insets;
 }
 
@@ -1285,7 +1303,7 @@ JSQMessagesKeyboardControllerDelegate>
 
     if (showKeyboard) {
         [self.inputToolbar.contentView.textView becomeFirstResponder];
-        [self jsq_updateCollectionViewInsets];
+        [self jsq_updateCollectionViewInsetsAnimated:NO];
         [self scrollToBottomAnimated:NO];
     }
 }

@@ -174,6 +174,8 @@ extern CGFloat const kSearchBarAnimationDuration;
  *  @discussion Use this property to adjust the top content inset to account for a custom subview at the top of your view controller.
  */
 @property (assign, nonatomic) CGFloat topContentAdditionalInset;
+// SCRUFF -- allow this to be animated
+- (void)setTopContentAdditionalInset:(CGFloat)topContentAdditionalInset animated:(BOOL)animated;
 
 /**
  *  Returns the picker toolbar view object managed by this view controller.
