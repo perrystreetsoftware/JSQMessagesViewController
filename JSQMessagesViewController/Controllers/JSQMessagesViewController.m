@@ -424,6 +424,7 @@ JSQMessagesKeyboardControllerDelegate>
     textView.text = nil;
     [textView.undoManager removeAllActions];
 
+    [self deliverTextViewChangedEventsToSearchResultsView:textView];
     [self.inputToolbar toggleSendButtonEnabled];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:UITextViewTextDidChangeNotification object:textView];
