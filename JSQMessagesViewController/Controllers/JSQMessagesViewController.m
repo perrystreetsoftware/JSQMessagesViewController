@@ -1125,6 +1125,21 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - Collection view utilities
 
+// If we have an active animation on the height of our inputToolbar, this method
+// will use that as the truth about the height; otherwise we will use our standard constraint
+// This is helpful for methods that want to make calculations while we're in the middle
+// of an animation
+- (CGFloat)inputToolbarPostAnimationHeight {
+    CGFloat postAnimationHeight = self.toolbarHeightConstraint.constant;
+    POPBasicAnimation *a1 = [self.toolbarHeightConstraint pop_animationForKey:@"self.toolbarHeightConstraint"];
+
+    if (a1) {
+        postAnimationHeight = [a1.toValue floatValue];
+    }
+
+    return postAnimationHeight;
+}
+
 - (void)jsq_updateCollectionViewInsetsAnimated:(BOOL)animated
 {
     // Input toolbar animates, so isHidden may not yet be updated
@@ -1132,11 +1147,12 @@ JSQMessagesKeyboardControllerDelegate>
 
     // isPickerViewVisible is updated immediately so we use that instead
     CGFloat topEdgeOfBottomWidget = 0;
+    CGFloat actualInputToolbarHeight = [self inputToolbarPostAnimationHeight];
 
     if (self.isPickerViewVisible) {
         topEdgeOfBottomWidget = CGRectGetMinY(self.pickerToolbar.frame);
     } else {
-        topEdgeOfBottomWidget = CGRectGetMinY(self.inputToolbar.frame) - self.inputToolbar.transform.ty;
+        topEdgeOfBottomWidget = CGRectGetMaxY(self.inputToolbar.frame) - actualInputToolbarHeight - self.inputToolbar.transform.ty;
     }
 
     CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - topEdgeOfBottomWidget;
