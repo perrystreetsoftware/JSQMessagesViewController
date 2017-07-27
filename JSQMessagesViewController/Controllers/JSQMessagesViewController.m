@@ -848,6 +848,8 @@ JSQMessagesKeyboardControllerDelegate>
     if (self.automaticallyScrollsToMostRecentMessage) {
         [self scrollToBottomAnimated:YES];
     }
+
+    [self deliverTextViewBeginEditingEventsToSearchResultsView:textView];
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -1503,6 +1505,19 @@ JSQMessagesKeyboardControllerDelegate>
             if (subview &&
                 [subview respondsToSelector:@selector(textViewDidChange:)]) {
                 [subview performSelectorOnMainThread:@selector(textViewDidChange:) withObject:textView waitUntilDone:NO];
+            }
+        }
+    }
+}
+
+- (void)deliverTextViewBeginEditingEventsToSearchResultsView:(UITextView *)textView {
+    if (self.isSearchResultsContainerViewVisible) {
+        if (self.inputToolbar.contentView.searchResultsContainerView.subviews.count > 0) {
+            UIView *subview = self.inputToolbar.contentView.searchResultsContainerView.subviews[0];
+
+            if (subview &&
+                [subview respondsToSelector:@selector(textViewDidBeginEditing:)]) {
+                [subview performSelectorOnMainThread:@selector(textViewDidBeginEditing:) withObject:textView waitUntilDone:NO];
             }
         }
     }
