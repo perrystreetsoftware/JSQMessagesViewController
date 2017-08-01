@@ -75,6 +75,8 @@
 // SCRUFF addition
 - (void)messagesCollectionViewCellDidTapUnsend:(JSQMessagesCollectionViewCell *)cell;
 
+- (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView;
+
 @end
 
 
