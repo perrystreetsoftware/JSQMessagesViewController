@@ -194,4 +194,12 @@
     }
 }
 
+- (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView {
+    NSIndexPath *indexPath = [self indexPathForCell:cell];
+
+    if ([self.delegate respondsToSelector:@selector(collectionView:didInteractWithURL:inRange:withTextView:atIndexPath:)]) {
+        [self.delegate collectionView:self didInteractWithURL:URL inRange:characterRange withTextView:textView atIndexPath:indexPath];
+    }
+}
+
 @end

@@ -124,4 +124,6 @@
 // SCRUFF addition
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapUnsendAtIndexPath:(NSIndexPath *)indexPath;
 
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView atIndexPath:(NSIndexPath *)indexPath;
+
 @end

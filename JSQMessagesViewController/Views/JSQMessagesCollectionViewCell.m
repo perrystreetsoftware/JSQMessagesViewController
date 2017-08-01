@@ -29,7 +29,7 @@
 static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
 
 
-@interface JSQMessagesCollectionViewCell ()
+@interface JSQMessagesCollectionViewCell () <UITextViewDelegate>
 
 @property (weak, nonatomic) IBOutlet JSQMessagesLabel *cellTopLabel;
 @property (weak, nonatomic) IBOutlet JSQMessagesLabel *messageBubbleTopLabel;
@@ -131,6 +131,8 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(jsq_handleTapGesture:)];
     [self addGestureRecognizer:tap];
     self.tapGestureRecognizer = tap;
+
+    self.textView.delegate = self;
 }
 
 - (void)dealloc
@@ -393,6 +395,16 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     }
     
     return NO;
+}
+
+#pragma mark - UITextViewDelegate
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+    if ([self.delegate respondsToSelector:@selector(messagesCollectionViewCell:didInteractWithURL:inRange:withTextView:)]) {
+        [self.delegate messagesCollectionViewCell:self didInteractWithURL:URL inRange:characterRange withTextView:textView];
+    }
+
+    return YES;
 }
 
 @end
