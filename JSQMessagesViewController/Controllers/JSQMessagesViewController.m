@@ -929,6 +929,11 @@ JSQMessagesKeyboardControllerDelegate>
     self.selectedIndexPathForMenu = nil;
 }
 
+// SCRUFF Added
+- (void)didReceiveContentSizeCategoryDidChange:(NSNotification *)notification {
+    [self.collectionView reloadData];
+}
+
 #pragma mark - Key-value observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -1247,6 +1252,11 @@ JSQMessagesKeyboardControllerDelegate>
                                                  selector:@selector(didReceiveMenuWillHideNotification:)
                                                      name:UIMenuControllerWillHideMenuNotification
                                                    object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(didReceiveContentSizeCategoryDidChange:)
+                                                     name:UIContentSizeCategoryDidChangeNotification
+                                                   object:nil];
     }
     else {
         [[NSNotificationCenter defaultCenter] removeObserver:self
@@ -1259,6 +1269,10 @@ JSQMessagesKeyboardControllerDelegate>
 
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:UIMenuControllerWillHideMenuNotification
+                                                      object:nil];
+
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:UIContentSizeCategoryDidChangeNotification
                                                       object:nil];
     }
 }

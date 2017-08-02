@@ -430,6 +430,22 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     return preferredEdgeInsets;
 }
 
+- (UIFont *)fontFromPreferredFontType:(JSQMessageDataPreferredFont)preferredFontType {
+    UIFont *defaultFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    UIFont *largeFont = [UIFont fontWithDescriptor:defaultFont.fontDescriptor
+                                              size:defaultFont.pointSize * 3];
+
+    switch (preferredFontType) {
+        case JSQMessageDataPreferredFontLarge:
+            return largeFont;
+            break;
+        case JSQMessageDataPreferredFontDefault:
+        default:
+            return defaultFont;
+            break;
+    }
+}
+
 - (UIFont *)messageBubbleFontForItemAtIndexPath:(NSIndexPath *)indexPath {
     id<JSQMessageData> messageItem = [self.collectionView.dataSource collectionView:self.collectionView
                                                       messageDataForItemAtIndexPath:indexPath];
@@ -437,7 +453,9 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     UIFont *preferredFont = nil;
 
     if ([messageItem respondsToSelector:@selector(preferredFont)]) {
-        preferredFont = [messageItem preferredFont];
+        JSQMessageDataPreferredFont preferredFontType = [messageItem preferredFont];
+
+        preferredFont = [self fontFromPreferredFontType:preferredFontType];
     }
 
     if (!preferredFont) {

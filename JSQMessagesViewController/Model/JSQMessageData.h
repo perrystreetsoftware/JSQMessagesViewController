@@ -20,6 +20,13 @@
 
 #import "JSQMessageMediaData.h"
 
+// SCRUFF added
+typedef NS_ENUM(NSInteger, JSQMessageDataPreferredFont) {
+    JSQMessageDataPreferredFontDefault = 0,
+    JSQMessageDataPreferredFontLarge,
+    JSQMessageDataPreferredFontTotal
+};
+
 /**
  *  The `JSQMessageData` protocol defines the common interface through which 
  *  a `JSQMessagesViewController` and `JSQMessagesCollectionView` interact with message model objects.
@@ -97,7 +104,7 @@
  */
 - (id<JSQMessageMediaData>)media;
 
-- (UIFont *)preferredFont;
+- (JSQMessageDataPreferredFont)preferredFont;
 - (UIEdgeInsets)preferredEdgeInsets;
 
 @end
