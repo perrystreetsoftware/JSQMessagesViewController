@@ -375,6 +375,13 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
 {
     CGPoint touchPt = [tap locationInView:self];
 
+    [self jsq_handleTapAtPoint:touchPt];
+}
+
+// SCRUFF addition – We need to be able to intercept touches from the
+// textView, so this method handles all our touches with a touchPt argument.
+
+- (void)jsq_handleTapAtPoint:(CGPoint)touchPt {
     if (CGRectContainsPoint(self.avatarContainerView.frame, touchPt)) {
         [self.delegate messagesCollectionViewCellDidTapAvatar:self];
     }
@@ -393,7 +400,7 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     if ([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]]) {
         return CGRectContainsPoint(self.messageBubbleContainerView.frame, touchPt);
     }
-    
+
     return NO;
 }
 
