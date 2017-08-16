@@ -75,6 +75,8 @@
 // SCRUFF addition
 - (void)messagesCollectionViewCellDidTapUnsend:(JSQMessagesCollectionViewCell *)cell;
 
+- (void)messagesCollectionViewCellDidTapAddPhrase:(JSQMessagesCollectionViewCell *)cell;
+
 - (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView;
 
 @end
@@ -212,5 +214,7 @@
  *  @warning Note that all message cells share the all actions registered here.
  */
 + (void)registerMenuAction:(SEL)action;
+
+- (void)jsq_handleTapAtPoint:(CGPoint)touchPt;
 
 @end
