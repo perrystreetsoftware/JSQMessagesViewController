@@ -462,8 +462,19 @@ JSQMessagesKeyboardControllerDelegate>
         return;
     }
 
-    NSIndexPath *lastCell = [NSIndexPath indexPathForItem:([self.collectionView numberOfItemsInSection:0] - 1) inSection:0];
-    [self scrollToIndexPath:lastCell animated:animated];
+    // If we don't want an animated scroll, then we are definitely better
+    // at setting our content offset than scrollToIndexPath, which is frequently
+    // off by a pixel or two when it uses scrollToItemAtIndexPath
+    if (!animated) {
+        UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:0];
+        CGPoint targetPoint = CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:0
+                                                                        finalInsets:finalEdgeInsetsAfterCurrentAnimation]);
+
+        self.collectionView.contentOffset = targetPoint;
+    } else {
+        NSIndexPath *lastCell = [NSIndexPath indexPathForItem:([self.collectionView numberOfItemsInSection:0] - 1) inSection:0];
+        [self scrollToIndexPath:lastCell animated:animated];
+    }
 }
 
 
@@ -504,9 +515,21 @@ JSQMessagesKeyboardControllerDelegate>
                                          // - CGRectGetHeight(self.inputToolbar.bounds);
     UICollectionViewScrollPosition scrollPosition = (cellSize.height > maxHeightForVisibleMessage) ? UICollectionViewScrollPositionBottom : UICollectionViewScrollPositionTop;
 
-    [self.collectionView scrollToItemAtIndexPath:indexPath
-                                atScrollPosition:scrollPosition
-                                        animated:animated];
+
+    // Check for current animations and allow them to override
+    POPBasicAnimation *a1 = [self.collectionView pop_animationForKey:@"collectionView kPOPScrollViewContentOffset"];
+
+    if (a1) {
+        // Ignore any kind of scroll operation requests if we are already
+        // in the middle of a scroll operation -- we are probably
+        // already animating to the bottom
+        // which is where this guy undoubtedly wants to go too
+        // so just let our animation continue
+    } else {
+        [self.collectionView scrollToItemAtIndexPath:indexPath
+                                    atScrollPosition:scrollPosition
+                                            animated:animated];
+    }
 }
 
 - (BOOL)isOutgoingMessage:(id<JSQMessageData>)messageItem
