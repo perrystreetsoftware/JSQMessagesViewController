@@ -462,21 +462,9 @@ JSQMessagesKeyboardControllerDelegate>
         return;
     }
 
-    // If we don't want an animated scroll, then we are definitely better
-    // at setting our content offset than scrollToIndexPath, which is frequently
-    // off by a pixel or two when it uses scrollToItemAtIndexPath
-    if (!animated) {
-        UIEdgeInsets finalEdgeInsetsAfterCurrentAnimation = [self jsq_computeCollectionViewInsets:0];
-        CGPoint targetPoint = CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:0
-                                                                        finalInsets:finalEdgeInsetsAfterCurrentAnimation]);
-
-        self.collectionView.contentOffset = targetPoint;
-    } else {
-        NSIndexPath *lastCell = [NSIndexPath indexPathForItem:([self.collectionView numberOfItemsInSection:0] - 1) inSection:0];
-        [self scrollToIndexPath:lastCell animated:animated];
-    }
+    NSIndexPath *lastCell = [NSIndexPath indexPathForItem:([self.collectionView numberOfItemsInSection:0] - 1) inSection:0];
+    [self scrollToIndexPath:lastCell animated:animated];
 }
-
 
 - (void)scrollToIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
 {
