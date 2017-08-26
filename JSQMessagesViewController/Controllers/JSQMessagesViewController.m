@@ -920,11 +920,32 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)jsq_setToolbarBottomLayoutGuideConstant:(CGFloat)constant
 {
+    BOOL toolbarBottomLayoutGuideChanged = constant != self.toolbarBottomLayoutGuide.constant;
+
     self.toolbarBottomLayoutGuide.constant = constant;
     [self.view setNeedsUpdateConstraints];
     [self.view layoutIfNeeded];
 
     [self jsq_updateCollectionViewInsetsAnimated:NO];
+
+    // If the bottom layout guide constant has changed, this means we probably
+    // have received a new keyboard dimension (it takes a sec or two to get the
+    // dimensions for Gboard and we get a number of callbacks where the constant
+    // is 0 before it finally becomes 200px+).
+    // When we get a new keyboard dimension, if we have previously started a
+    // contentOffset animation (because we are showing the searchResultsContainerView for example)
+    // we must prematurely end that animation
+    // We then rely on a call to scrollToBottomAnimated to properly position the contentOffset
+    // at the bottom of our collectionView
+    if (toolbarBottomLayoutGuideChanged) {
+        POPBasicAnimation *a1 = [self.collectionView pop_animationForKey:@"collectionView kPOPScrollViewContentOffset"];
+
+        if (a1) {
+            [self.collectionView pop_removeAnimationForKey:@"collectionView kPOPScrollViewContentOffset"];
+        }
+    }
+
+    // This will now serve to animate our contentOffset, if we had previously removed the animation
     [self scrollToBottomAnimated:NO];
 }
 
