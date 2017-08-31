@@ -206,6 +206,18 @@
     }
 }
 
+- (void)messagesCollectionViewCellDidTapCopy:(JSQMessagesCollectionViewCell *)cell {
+    NSIndexPath *indexPath = [self indexPathForCell:cell];
+    if (indexPath == nil) {
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(collectionView:didTapCopyAtIndexPath:)]) {
+        [self.delegate collectionView:self
+           didTapCopyAtIndexPath:indexPath];
+    }
+}
+
 - (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView {
     NSIndexPath *indexPath = [self indexPathForCell:cell];
 

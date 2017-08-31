@@ -77,6 +77,8 @@
 
 - (void)messagesCollectionViewCellDidTapAddPhrase:(JSQMessagesCollectionViewCell *)cell;
 
+- (void)messagesCollectionViewCellDidTapCopy:(JSQMessagesCollectionViewCell *)cell;
+
 - (void)messagesCollectionViewCell:(JSQMessagesCollectionViewCell *)cell didInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange withTextView:(UITextView *)textView;
 
 @end
