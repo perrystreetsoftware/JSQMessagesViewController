@@ -1400,7 +1400,8 @@ JSQMessagesKeyboardControllerDelegate>
     CGFloat availableContentDisplayHeight = self.collectionView.frame.size.height -
     finalEdgeInsetsAfterCurrentAnimation.bottom - finalEdgeInsetsAfterCurrentAnimation.top;
 
-    if (self.collectionView.contentSize.height > availableContentDisplayHeight) {
+    // https://stackoverflow.com/a/21717985/61072
+    if (self.collectionView.collectionViewLayout.collectionViewContentSize.height > availableContentDisplayHeight) {
         POPBasicAnimation *a4 = [POPBasicAnimation easeOutAnimation];
         a4.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentOffset];
         a4.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy
@@ -1483,7 +1484,11 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (CGFloat)requiredScrollOffsetToBeAtBottom:(CGFloat)dy finalInsets:(UIEdgeInsets)finalEdgeInsetsAfterCurrentAnimation {
     float scrollViewHeight = self.collectionView.frame.size.height;
-    float scrollContentSizeHeight = self.collectionView.contentSize.height;
+
+    // Why we have to use collectionViewLayout.collectionViewContentSize instead of collectionView.contentSize
+    // when we have recently done a reloadData
+    // https://stackoverflow.com/a/21717985/61072
+    float scrollContentSizeHeight = self.collectionView.collectionViewLayout.collectionViewContentSize.height;
     //    float scrollOffset = self.collectionView.contentOffset.y;
     float scrollInset = finalEdgeInsetsAfterCurrentAnimation.bottom;
 
