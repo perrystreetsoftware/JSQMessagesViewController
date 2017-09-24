@@ -886,10 +886,13 @@ JSQMessagesKeyboardControllerDelegate>
 
             CGFloat dy = newContentSize.height - oldContentSize.height;
 
-            [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy];
-            [self jsq_updateCollectionViewInsetsAnimated:NO];
-            if (self.automaticallyScrollsToMostRecentMessage) {
-                [self scrollToBottomAnimated:NO];
+            // We only care about changes in y; changes in x (triggered by presence or absene of frequent phrases icon) are irrelevant
+            if (dy != 0) {
+                [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy];
+                [self jsq_updateCollectionViewInsetsAnimated:NO];
+                if (self.automaticallyScrollsToMostRecentMessage) {
+                    [self scrollToBottomAnimated:NO];
+                }
             }
         }
     }
