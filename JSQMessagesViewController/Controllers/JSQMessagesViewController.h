@@ -216,7 +216,7 @@ extern CGFloat const kSearchBarAnimationDuration;
  *  you should also override `messagesViewController` to return your
  *  view controller loaded from your custom nib.
  */
-+ (UINib *)nib;
+//+ (UINib *)nib;
 
 /**
  *  Creates and returns a new `JSQMessagesViewController` object.
