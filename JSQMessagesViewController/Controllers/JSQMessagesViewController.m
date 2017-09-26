@@ -82,16 +82,18 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - Class methods
 
-+ (UINib *)nib
-{
-    return [UINib nibWithNibName:NSStringFromClass([JSQMessagesViewController class])
-                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
-}
+//+ (UINib *)nib
+//{
+//    return [UINib nibWithNibName:NSStringFromClass([JSQMessagesViewController class])
+//                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
+//}
 
 + (instancetype)messagesViewController
 {
-    return [[[self class] alloc] initWithNibName:NSStringFromClass([JSQMessagesViewController class])
-                                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
+    return [[UIStoryboard storyboardWithName:NSStringFromClass([JSQMessagesViewController class])
+                                      bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]] instantiateViewControllerWithIdentifier:@"messagesViewController"];
+//    return [[[self class] alloc] initWithNibName:NSStringFromClass([JSQMessagesViewController class])
+//                                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
 }
 
 + (void)initialize {
@@ -211,7 +213,7 @@ JSQMessagesKeyboardControllerDelegate>
 {
     [super viewDidLoad];
 
-    [[[self class] nib] instantiateWithOwner:self options:nil];
+//    [[[self class] nib] instantiateWithOwner:self options:nil];
 
     [self jsq_configureMessagesViewController];
     [self jsq_registerForNotifications:YES];

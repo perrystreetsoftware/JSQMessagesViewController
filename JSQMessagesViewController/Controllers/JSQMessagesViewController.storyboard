@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Messages View Controller-->
+        <scene sceneID="bM9-wz-Sw5">
+            <objects>
+                <viewController storyboardIdentifier="messagesViewController" id="EfC-wb-0IK" customClass="JSQMessagesViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="tuN-K0-ew8">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="9nZ-q0-Ydr" customClass="JSQMessagesCollectionView">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="dMi-Xh-3Wd" customClass="JSQMessagesCollectionViewFlowLayout">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                            </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="shQ-Gh-piq">
+                                <rect key="frame" x="0.0" y="535" width="375" height="44"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.84550506160000005" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="2jX-w5-wWQ"/>
+                                </constraints>
+                            </view>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mXE-mk-Gc1" customClass="JSQMessagesInputToolbar">
+                                <rect key="frame" x="0.0" y="579" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="YnG-Ms-2mf"/>
+                                </constraints>
+                                <items/>
+                            </toolbar>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Stt-4r-R8V">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="cCn-q9-ccR"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="mXE-mk-Gc1" firstAttribute="bottom" secondItem="Stt-4r-R8V" secondAttribute="top" id="07Q-J6-zwm"/>
+                            <constraint firstItem="Stt-4r-R8V" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="PAW-uK-zsn"/>
+                            <constraint firstItem="xfy-1d-ZxV" firstAttribute="bottom" secondItem="Stt-4r-R8V" secondAttribute="bottom" id="UrS-yd-0O8"/>
+                            <constraint firstItem="mXE-mk-Gc1" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="Vc0-U6-bZD"/>
+                            <constraint firstItem="shQ-Gh-piq" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="ZV6-JN-Wk6"/>
+                            <constraint firstItem="mXE-mk-Gc1" firstAttribute="leading" secondItem="9nZ-q0-Ydr" secondAttribute="leading" id="ZbS-sj-eqX"/>
+                            <constraint firstItem="shQ-Gh-piq" firstAttribute="leading" secondItem="9nZ-q0-Ydr" secondAttribute="leading" id="aBx-g5-jBF"/>
+                            <constraint firstItem="Stt-4r-R8V" firstAttribute="leading" secondItem="9nZ-q0-Ydr" secondAttribute="leading" id="cG5-u9-r2n"/>
+                            <constraint firstItem="9nZ-q0-Ydr" firstAttribute="leading" secondItem="xfy-1d-ZxV" secondAttribute="leading" id="gVN-Q3-JhF"/>
+                            <constraint firstItem="shQ-Gh-piq" firstAttribute="bottom" secondItem="mXE-mk-Gc1" secondAttribute="top" id="iR1-xy-NSf"/>
+                            <constraint firstItem="xfy-1d-ZxV" firstAttribute="trailing" secondItem="shQ-Gh-piq" secondAttribute="trailing" id="ptH-du-gUE"/>
+                            <constraint firstItem="9nZ-q0-Ydr" firstAttribute="top" secondItem="tuN-K0-ew8" secondAttribute="top" id="smr-BI-9hY"/>
+                            <constraint firstItem="xfy-1d-ZxV" firstAttribute="bottom" secondItem="9nZ-q0-Ydr" secondAttribute="bottom" id="yfR-Pz-YJA"/>
+                            <constraint firstItem="xfy-1d-ZxV" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="zlh-Am-gsM"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="xfy-1d-ZxV"/>
+                    </view>
+                    <connections>
+                        <outlet property="adContainerHeightConstraint" destination="2jX-w5-wWQ" id="dPm-qW-Mny"/>
+                        <outlet property="adContainerView" destination="shQ-Gh-piq" id="pyY-wY-qq1"/>
+                        <outlet property="collectionView" destination="9nZ-q0-Ydr" id="Uph-7W-nbw"/>
+                        <outlet property="inputToolbar" destination="mXE-mk-Gc1" id="fC9-iW-wmH"/>
+                        <outlet property="pickerToolbar" destination="Stt-4r-R8V" id="vM9-RP-EHh"/>
+                        <outlet property="pickerToolbarHeightConstraint" destination="cCn-q9-ccR" id="9Cq-XP-r31"/>
+                        <outlet property="toolbarHeightConstraint" destination="YnG-Ms-2mf" id="XPA-GE-HhI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eEF-Ab-D9b" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-4" y="131"/>
+        </scene>
+    </scenes>
+</document>
