@@ -61,7 +61,9 @@
 
         // this extra inset value is needed because `boundingRectWithSize:` is slightly off
         // see comment below
-        _additionalInset = 2;
+
+        // es added because need a bit more extra padding when using bold text
+        _additionalInset = UIAccessibilityIsBoldTextEnabled() ? 3 : 2;
     }
     return self;
 }
