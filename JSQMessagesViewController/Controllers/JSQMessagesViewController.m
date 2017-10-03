@@ -1044,6 +1044,19 @@ JSQMessagesKeyboardControllerDelegate>
     }
 }
 
+- (CGFloat)currentSearchResultsContainerHeight {
+    CGFloat searchResultsHeight = 0;
+    POPBasicAnimation *a1 = [self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint pop_animationForKey:@"searchResultsContainerViewHeightConstraint"];
+
+    if (a1) {
+        searchResultsHeight = [a1.toValue floatValue];
+    } else {
+        searchResultsHeight = self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint.constant;
+    }
+
+    return searchResultsHeight;
+}
+
 - (void)jsq_adjustInputToolbarHeightConstraintByDelta:(CGFloat)dy
 {
     CGFloat toolbarHeightConstraintValue = self.toolbarHeightConstraint.constant;
@@ -1055,7 +1068,9 @@ JSQMessagesKeyboardControllerDelegate>
 
     CGFloat proposedHeight = toolbarHeightConstraintValue + dy;
 
-    CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight);
+    // When we are adjusting our height because of a content size change, we need to estimate our final height
+    // based on height of text field + height of search results container (if visible)
+    CGFloat finalHeight = MAX(proposedHeight, self.inputToolbar.preferredDefaultHeight + [self currentSearchResultsContainerHeight]);
 
     if (self.inputToolbar.maximumHeight != NSNotFound) {
         finalHeight = MIN(finalHeight, self.inputToolbar.maximumHeight);
