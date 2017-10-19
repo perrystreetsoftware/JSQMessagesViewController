@@ -32,6 +32,8 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 @interface JSQMessagesInputToolbar ()
 
 @property (assign, nonatomic) BOOL jsq_isObserving;
+@property (nonatomic) NSLayoutConstraint *leadingContentConstraint;
+@property (nonatomic) NSLayoutConstraint *trailingContentConstraint;
 
 @end
 
@@ -58,7 +60,16 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 
     toolbarContentView.frame = self.frame;
     [self addSubview:toolbarContentView];
-    [self jsq_pinAllEdgesOfSubview:toolbarContentView];
+
+    [toolbarContentView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [toolbarContentView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+
+    self.leadingContentConstraint = [toolbarContentView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor];
+    self.trailingContentConstraint = [toolbarContentView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor];
+
+    self.leadingContentConstraint.active = YES;
+    self.trailingContentConstraint.active = YES;
+
     [self setNeedsUpdateConstraints];
     _contentView = toolbarContentView;
 
@@ -193,6 +204,16 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     @catch (NSException *__unused exception) { }
     
     _jsq_isObserving = NO;
+}
+
+#pragma mark: - SCRUFF additions
+
+- (void)setLeadingConstant:(CGFloat)constant {
+    self.leadingContentConstraint.constant = constant;
+}
+
+- (void)setTrailingConstant:(CGFloat)constant {
+    self.trailingContentConstraint.constant = constant;
 }
 
 @end
