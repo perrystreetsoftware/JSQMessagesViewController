@@ -101,6 +101,8 @@
 // SCRUFF addition
 - (void)toggleSendButtonEnabled:(BOOL)searchResultsContainerVisible;
 @property (nonatomic) BOOL searchResultsShouldBlockSendButton;
+- (void)setLeadingConstant:(CGFloat)constant;
+- (void)setTrailingConstant:(CGFloat)constant;
 
 /**
  *  Loads the content view for the toolbar.
