@@ -270,6 +270,12 @@ JSQMessagesKeyboardControllerDelegate>
     [self.keyboardController endListeningForKeyboard];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+
+    // Because the topLayoutGuide.length is now valid
+    [self jsq_updateCollectionViewInsetsAnimated:NO];
+}
 
 #pragma mark - View rotation
 
