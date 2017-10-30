@@ -38,6 +38,9 @@
 const CGFloat kJSQMessagesCollectionViewCellLabelHeightDefault = 20.0f;
 const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
 
+const CGFloat kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPhone = 50.0f;
+const CGFloat kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPad = 240.0f;
+
 
 @interface JSQMessagesCollectionViewFlowLayout ()
 
@@ -68,10 +71,10 @@ const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault = 30.0f;
     // _messageBubbleFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     
     if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        _messageBubbleLeftRightMargin = 240.0f;
+        _messageBubbleLeftRightMargin = kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPad;
     }
     else {
-        _messageBubbleLeftRightMargin = 50.0f;
+        _messageBubbleLeftRightMargin = kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPhone;
     }
     
     _messageBubbleTextViewFrameInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 6.0f);
