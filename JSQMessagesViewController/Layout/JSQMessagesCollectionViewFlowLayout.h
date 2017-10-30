@@ -40,6 +40,9 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewCellLabelHeightDefault
  */
 FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 
+FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPhone;
+FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewDefaultMessageBubbleLeftRightMarginPad;
+
 
 
 /**
