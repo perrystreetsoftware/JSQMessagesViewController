@@ -1306,10 +1306,8 @@ JSQMessagesKeyboardControllerDelegate>
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard {
     self.isPickerViewVisible = NO;
 
-    if (!showKeyboard) {
-        // First, hide the pickerView
-        [self.inputToolbar.contentView.textView resignFirstResponder];
-    }
+    // First, hide the pickerView
+    [self.inputToolbar.contentView.textView resignFirstResponder];
 
     // Set the custom inputView to nil to restore the keyboard
     self.inputToolbar.contentView.textView.inputView = nil;
