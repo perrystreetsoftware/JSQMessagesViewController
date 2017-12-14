@@ -39,6 +39,7 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
 @property (weak, nonatomic) IBOutlet UIImageView *messageBubbleImageView;
 @property (weak, nonatomic) IBOutlet JSQMessagesCellTextView *textView;
 @property (weak, nonatomic) IBOutlet UIImageView *restrictedImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *restrictedIconImageView;
 
 @property (weak, nonatomic) IBOutlet UIImageView *avatarImageView;
 @property (weak, nonatomic) IBOutlet UIView *avatarContainerView;
@@ -328,6 +329,7 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     _mediaView = mediaView;
 
     [self.messageBubbleContainerView bringSubviewToFront:self.restrictedImageView];
+    [self.messageBubbleContainerView bringSubviewToFront:self.restrictedIconImageView];
 
     //  because of cell re-use (and caching media views, if using built-in library media item)
     //  we may have dequeued a cell with a media view and add this one on top
@@ -335,7 +337,8 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         for (NSUInteger i = 0; i < self.messageBubbleContainerView.subviews.count; i++) {
             if (self.messageBubbleContainerView.subviews[i] != _mediaView &&
-                self.messageBubbleContainerView.subviews[i] != _restrictedImageView) {
+                self.messageBubbleContainerView.subviews[i] != _restrictedImageView &&
+                self.messageBubbleContainerView.subviews[i] != _restrictedIconImageView) {
                 [self.messageBubbleContainerView.subviews[i] removeFromSuperview];
             }
         }

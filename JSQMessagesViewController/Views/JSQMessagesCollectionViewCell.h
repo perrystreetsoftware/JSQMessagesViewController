@@ -132,6 +132,11 @@
 @property (weak, nonatomic, readonly) IBOutlet UIImageView *restrictedImageView;
 
 /**
+ *  Returns the restricted icon image view of the cell.
+ */
+@property (weak, nonatomic, readonly) IBOutlet UIImageView *restrictedIconImageView;
+
+/**
  *  Returns the bubble image view of the cell that is responsible for displaying message bubble images.
  *
  *  @warning If mediaView returns a non-nil view, then this value will be `nil`.
