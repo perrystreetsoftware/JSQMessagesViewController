@@ -221,8 +221,8 @@
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
     paragraphStyle.alignment = self.textAlignment;
 
-    return @{ NSFontAttributeName : self.font,
-              NSForegroundColorAttributeName : self.placeHolderTextColor,
+    return @{ NSFontAttributeName : self.font ?: [UIFont preferredFontForTextStyle:UIFontTextStyleBody],
+              NSForegroundColorAttributeName : self.placeHolderTextColor ?: [UIColor lightGrayColor],
               NSParagraphStyleAttributeName : paragraphStyle };
 }
 
