@@ -224,4 +224,7 @@
 
 - (void)jsq_handleTapAtPoint:(CGPoint)touchPt;
 
+// es added
+- (void)setAvatarViewSize:(CGSize)avatarViewSize;
+
 @end

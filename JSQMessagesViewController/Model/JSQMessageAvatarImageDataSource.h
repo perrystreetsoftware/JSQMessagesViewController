@@ -34,16 +34,18 @@
 
 @required
 
+- (void)installAvatarInto:(UIImageView *)imageView;
+
 /**
  *  @return The avatar image for a regular display state.
- *  
+ *
  *  @discussion You may return `nil` from this method while the image is being downloaded.
  */
 - (UIImage *)avatarImage;
 
 /**
- *  @return The avatar image for a highlighted display state. 
- *  
+ *  @return The avatar image for a highlighted display state.
+ *
  *  @discussion You may return `nil` from this method if this does not apply.
  */
 - (UIImage *)avatarHighlightedImage;
@@ -53,7 +55,7 @@
  *  For example, if avatarImage needs to be downloaded, this placeholder image
  *  will be used until avatarImage is not `nil`.
  *
- *  @discussion If you do not need support for a placeholder image, that is, your images 
+ *  @discussion If you do not need support for a placeholder image, that is, your images
  *  are stored locally on the device, then you may simply return the same value as avatarImage here.
  *
  *  @warning You must not return `nil` from this method.

@@ -568,16 +568,17 @@ JSQMessagesKeyboardControllerDelegate>
     if (needsAvatar) {
         avatarImageDataSource = [collectionView.dataSource collectionView:collectionView avatarImageDataForItemAtIndexPath:indexPath];
         if (avatarImageDataSource != nil) {
+            [avatarImageDataSource installAvatarInto:cell.avatarImageView];
 
-            UIImage *avatarImage = [avatarImageDataSource avatarImage];
-            if (avatarImage == nil) {
-                cell.avatarImageView.image = [avatarImageDataSource avatarPlaceholderImage];
-                cell.avatarImageView.highlightedImage = nil;
-            }
-            else {
-                cell.avatarImageView.image = avatarImage;
-                cell.avatarImageView.highlightedImage = [avatarImageDataSource avatarHighlightedImage];
-            }
+//            UIImage *avatarImage = [avatarImageDataSource avatarImage];
+//            if (avatarImage == nil) {
+//                cell.avatarImageView.image = [avatarImageDataSource avatarPlaceholderImage];
+//                cell.avatarImageView.highlightedImage = nil;
+//            }
+//            else {
+//                cell.avatarImageView.image = avatarImage;
+//                cell.avatarImageView.highlightedImage = [avatarImageDataSource avatarHighlightedImage];
+//            }
         }
     }
 
