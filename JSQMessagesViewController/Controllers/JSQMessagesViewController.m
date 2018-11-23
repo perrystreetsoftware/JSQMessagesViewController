@@ -53,14 +53,17 @@ JSQMessagesKeyboardControllerDelegate>
 @property (weak, nonatomic) IBOutlet JSQMessagesInputToolbar *inputToolbar;
 @property (weak, nonatomic) IBOutlet UIView *pickerToolbar;
 @property (weak, nonatomic) IBOutlet UIView *adContainerView;
+@property (weak, nonatomic) IBOutlet UIView *chatMetadataContainerView;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *toolbarHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *toolbarBottomLayoutGuide;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pickerToolbarHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pickerViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *adContainerHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *chatMetadataContainerHeightConstraint;
 
 @property (assign, nonatomic) BOOL isAdVisible;
+@property (assign, nonatomic) BOOL isChatMetadataVisible;
 
 @property (weak, nonatomic) UIView *snapshotView;
 
@@ -143,6 +146,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.bottomContentAdditionalInset = [self targetAdHeight];
 
     self.isAdVisible = YES;
+    self.isChatMetadataVisible = YES;
 
     self.adContainerView.clipsToBounds = YES;
     self.adContainerView.accessibilityLabel = @"Ad Container";
@@ -921,6 +925,7 @@ JSQMessagesKeyboardControllerDelegate>
 
     // Show/hide the ad container view
     self.isAdVisible = heightFromBottom == 0.0;
+    self.isChatMetadataVisible = heightFromBottom == 0.0;
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
@@ -1149,11 +1154,13 @@ JSQMessagesKeyboardControllerDelegate>
 
     CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - topEdgeOfBottomWidget;
     CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
+    CGFloat chatMetadataContainerInset = self.isChatMetadataVisible ? [self targetChatMetadataHeight] : 0.0;
 
     self.adContainerHeightConstraint.constant = adContainerInset;
+    self.chatMetadataContainerHeightConstraint.constant = chatMetadataContainerInset;
 
     [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
-                                  bottomValue:defaultBottomInset + adContainerInset
+                                  bottomValue:defaultBottomInset + adContainerInset + chatMetadataContainerInset
                                      animated:animated];
 
 
@@ -1350,6 +1357,10 @@ JSQMessagesKeyboardControllerDelegate>
     return 44.0;
 }
 
+- (CGFloat)targetChatMetadataHeight {
+    return 44.0;
+}
+
 #pragma mark - SCRUFF Additions for searchResultsContainerView
 
 - (void)searchResultsContainerViewVisible:(BOOL)visible animated:(BOOL)animated {
@@ -1477,10 +1488,12 @@ JSQMessagesKeyboardControllerDelegate>
 {
     CGFloat defaultBottomInset = CGRectGetMaxY(self.collectionView.frame) - [self computeTopYOffsetOfInputToolbar:dy];
     CGFloat adContainerInset = self.isAdVisible ? [self targetAdHeight] : 0.0;
+    CGFloat chatMetadataContainerInset = self.isChatMetadataVisible ? [self targetChatMetadataHeight] : 0.0;
 
     self.adContainerHeightConstraint.constant = adContainerInset;
+    self.chatMetadataContainerHeightConstraint.constant = chatMetadataContainerInset;
 
-    UIEdgeInsets insets = UIEdgeInsetsMake(self.topLayoutGuide.length + self.topContentAdditionalInset, 0.0f, defaultBottomInset + adContainerInset + dy, 0.0f);
+    UIEdgeInsets insets = UIEdgeInsetsMake(self.topLayoutGuide.length + self.topContentAdditionalInset, 0.0f, defaultBottomInset + adContainerInset + chatMetadataContainerInset + dy, 0.0f);
 
     return insets;
 }

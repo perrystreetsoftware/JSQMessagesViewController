@@ -79,7 +79,7 @@ extern CGFloat const kSearchBarAnimationDuration;
 @property (assign, nonatomic) BOOL automaticallyScrollsToMostRecentMessage;
 
 /**
- *  The collection view cell identifier to use for dequeuing outgoing message collection view cells 
+ *  The collection view cell identifier to use for dequeuing outgoing message collection view cells
  *  in the collectionView for text messages.
  *
  *  @discussion This cell identifier is used for outgoing text message data items.
@@ -88,10 +88,10 @@ extern CGFloat const kSearchBarAnimationDuration;
  *
  *  @see JSQMessagesCollectionViewCellOutgoing.
  *
- *  @warning Overriding this property's default value is *not* recommended. 
+ *  @warning Overriding this property's default value is *not* recommended.
  *  You should only override this property's default value if you are proividing your own cell prototypes.
- *  These prototypes must be registered with the collectionView for reuse and you are then responsible for 
- *  completely overriding many delegate and data source methods for the collectionView, 
+ *  These prototypes must be registered with the collectionView for reuse and you are then responsible for
+ *  completely overriding many delegate and data source methods for the collectionView,
  *  including `collectionView:cellForItemAtIndexPath:`.
  */
 @property (copy, nonatomic) NSString *outgoingCellIdentifier;
@@ -115,7 +115,7 @@ extern CGFloat const kSearchBarAnimationDuration;
 @property (copy, nonatomic) NSString *outgoingMediaCellIdentifier;
 
 /**
- *  The collection view cell identifier to use for dequeuing incoming message collection view cells 
+ *  The collection view cell identifier to use for dequeuing incoming message collection view cells
  *  in the collectionView for text messages.
  *
  *  @discussion This cell identifier is used for incoming text message data items.
@@ -124,16 +124,16 @@ extern CGFloat const kSearchBarAnimationDuration;
  *
  *  @see JSQMessagesCollectionViewCellIncoming.
  *
- *  @warning Overriding this property's default value is *not* recommended. 
- *  You should only override this property's default value if you are proividing your own cell prototypes. 
- *  These prototypes must be registered with the collectionView for reuse and you are then responsible for 
- *  completely overriding many delegate and data source methods for the collectionView, 
+ *  @warning Overriding this property's default value is *not* recommended.
+ *  You should only override this property's default value if you are proividing your own cell prototypes.
+ *  These prototypes must be registered with the collectionView for reuse and you are then responsible for
+ *  completely overriding many delegate and data source methods for the collectionView,
  *  including `collectionView:cellForItemAtIndexPath:`.
  */
 @property (copy, nonatomic) NSString *incomingCellIdentifier;
 
 /**
- *  The collection view cell identifier to use for dequeuing incoming message collection view cells 
+ *  The collection view cell identifier to use for dequeuing incoming message collection view cells
  *  in the collectionView for media messages.
  *
  *  @discussion This cell identifier is used for incoming media message data items.
@@ -191,6 +191,11 @@ extern CGFloat const kSearchBarAnimationDuration;
  *  Returns the ad container view object managed by this view controller.
  */
 @property (weak, readonly, nonatomic) IBOutlet UIView *adContainerView;
+
+/**
+ *  Returns the a container view object managed by this view controller for chat metadata.
+ */
+@property (weak, readonly, nonatomic) IBOutlet UIView *chatMetadataContainerView;
 
 /**
  *  Determines if the picker view is visible.

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,6 +29,13 @@
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CzK-Q2-ajI">
+                                <rect key="frame" x="0.0" y="483" width="375" height="44"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="Ibg-8E-MgP"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="shQ-Gh-piq">
                                 <rect key="frame" x="0.0" y="535" width="375" height="44"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.84550506160000005" colorSpace="calibratedWhite"/>
@@ -54,6 +61,8 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="mXE-mk-Gc1" firstAttribute="bottom" secondItem="Stt-4r-R8V" secondAttribute="top" id="07Q-J6-zwm"/>
+                            <constraint firstItem="CzK-Q2-ajI" firstAttribute="leading" secondItem="xfy-1d-ZxV" secondAttribute="leading" id="DiP-Mv-lp4"/>
+                            <constraint firstItem="shQ-Gh-piq" firstAttribute="top" secondItem="CzK-Q2-ajI" secondAttribute="bottom" constant="8" id="KPz-7m-b88"/>
                             <constraint firstItem="Stt-4r-R8V" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="PAW-uK-zsn"/>
                             <constraint firstItem="xfy-1d-ZxV" firstAttribute="bottom" secondItem="Stt-4r-R8V" secondAttribute="bottom" id="UrS-yd-0O8"/>
                             <constraint firstItem="mXE-mk-Gc1" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="Vc0-U6-bZD"/>
@@ -65,6 +74,7 @@
                             <constraint firstItem="shQ-Gh-piq" firstAttribute="bottom" secondItem="mXE-mk-Gc1" secondAttribute="top" id="iR1-xy-NSf"/>
                             <constraint firstItem="xfy-1d-ZxV" firstAttribute="trailing" secondItem="shQ-Gh-piq" secondAttribute="trailing" id="ptH-du-gUE"/>
                             <constraint firstItem="9nZ-q0-Ydr" firstAttribute="top" secondItem="tuN-K0-ew8" secondAttribute="top" id="smr-BI-9hY"/>
+                            <constraint firstItem="CzK-Q2-ajI" firstAttribute="trailing" secondItem="xfy-1d-ZxV" secondAttribute="trailing" id="ya3-vG-Rgc"/>
                             <constraint firstItem="xfy-1d-ZxV" firstAttribute="bottom" secondItem="9nZ-q0-Ydr" secondAttribute="bottom" id="yfR-Pz-YJA"/>
                             <constraint firstItem="xfy-1d-ZxV" firstAttribute="trailing" secondItem="9nZ-q0-Ydr" secondAttribute="trailing" id="zlh-Am-gsM"/>
                         </constraints>
@@ -73,6 +83,8 @@
                     <connections>
                         <outlet property="adContainerHeightConstraint" destination="2jX-w5-wWQ" id="dPm-qW-Mny"/>
                         <outlet property="adContainerView" destination="shQ-Gh-piq" id="pyY-wY-qq1"/>
+                        <outlet property="chatMetadataContainerHeightConstraint" destination="Ibg-8E-MgP" id="eza-FP-8KH"/>
+                        <outlet property="chatMetadataContainerView" destination="CzK-Q2-ajI" id="G8F-gd-amb"/>
                         <outlet property="collectionView" destination="9nZ-q0-Ydr" id="Uph-7W-nbw"/>
                         <outlet property="inputToolbar" destination="mXE-mk-Gc1" id="fC9-iW-wmH"/>
                         <outlet property="pickerToolbar" destination="Stt-4r-R8V" id="vM9-RP-EHh"/>
@@ -82,7 +94,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eEF-Ab-D9b" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-4" y="131"/>
+            <point key="canvasLocation" x="-4" y="130.88455772113943"/>
         </scene>
     </scenes>
 </document>
