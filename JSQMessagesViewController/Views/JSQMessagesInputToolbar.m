@@ -127,7 +127,7 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     if (self.sendButtonOnRight) {
         BOOL searchResultsBlockingSend = searchResultsContainerVisible && self.searchResultsShouldBlockSendButton;
         // Show/hide the send button instead of dimming it
-        self.contentView.isRightBarButtonItemHidden = (!hasText || searchResultsBlockingSend);
+        self.contentView.isRightBarButtonItemHidden = (!hasText || searchResultsBlockingSend || self.disableSendButton);
     }
     else {
         self.contentView.leftBarButtonItem.enabled = hasText;
@@ -202,7 +202,7 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
                              context:kJSQMessagesInputToolbarKeyValueObservingContext];
     }
     @catch (NSException *__unused exception) { }
-    
+
     _jsq_isObserving = NO;
 }
 

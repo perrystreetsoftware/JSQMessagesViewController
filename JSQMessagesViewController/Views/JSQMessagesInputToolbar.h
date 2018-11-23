@@ -101,6 +101,7 @@
 // SCRUFF addition
 - (void)toggleSendButtonEnabled:(BOOL)searchResultsContainerVisible;
 @property (nonatomic) BOOL searchResultsShouldBlockSendButton;
+@property (nonatomic) BOOL disableSendButton;
 - (void)setLeadingConstant:(CGFloat)constant;
 - (void)setTrailingConstant:(CGFloat)constant;
 
