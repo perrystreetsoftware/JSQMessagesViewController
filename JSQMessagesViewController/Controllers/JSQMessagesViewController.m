@@ -1093,12 +1093,61 @@ JSQMessagesKeyboardControllerDelegate>
             [self.toolbarHeightConstraint pop_removeAnimationForKey:@"self.toolbarHeightConstraint"];
             a1.toValue = @(finalHeight);
             [self.toolbarHeightConstraint pop_addAnimation:a1 forKey:@"self.toolbarHeightConstraint"];
+
+            __weak __typeof(self)weakSelf = self;
+            [a1 setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+                __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+                if (finished) {
+                    [strongSelf relayoutViewAfterInputToolbarHeightChange];
+                    [strongSelf toolbarAnimationDidComplete];
+                }
+            }];
         } else {
             self.toolbarHeightConstraint.constant = finalHeight;
+            [self relayoutViewAfterInputToolbarHeightChange];
         }
-        [self.view setNeedsUpdateConstraints];
-        [self.view layoutIfNeeded];
     }
+}
+
+- (void)relayoutViewAfterInputToolbarHeightChange {
+    [self.view setNeedsUpdateConstraints];
+    [self.view layoutIfNeeded];
+}
+
+- (void)toolbarAnimationDidComplete {
+    if (![self hasPendingToolbarAnimations]) {
+        //        NSLog(@"jsq_toolbarAnimationsCompleted: Accepted because pending animations complete");
+
+        // Put this callback on the next run loop to ensure the view layoutIfNeeded calls are completed
+        dispatch_async(dispatch_get_main_queue(),^{
+            [self jsq_toolbarAnimationsCompleted];
+        });
+    } else {
+        //        NSLog(@"jsq_toolbarAnimationsCompleted: Rejected because pending animations");
+    }
+}
+
+- (void)jsq_toolbarAnimationsCompleted {
+    // no-op
+}
+
+// This is an array of all elements for which we add pop_ animations
+// it is very important that we keep this up-to-date and accurate!
+- (NSArray *)animatableToolbarElements {
+    return @[self.toolbarHeightConstraint, self.collectionView, self.inputToolbar.contentView.searchResultsContainerViewHeightConstraint];
+}
+
+- (BOOL)hasPendingToolbarAnimations {
+    for (NSObject *animatedObj in [self animatableToolbarElements]) {
+        if ([animatedObj pop_animationKeys].count > 0) {
+            //            NSLog(@"jsq_toolbarAnimationsCompleted: hasPendingToolbarAnimations: On %@", animatedObj.description);
+
+            return YES;
+        }
+    }
+
+    return NO;
 }
 
 - (void)jsq_scrollComposerTextViewToBottomAnimated:(BOOL)animated
@@ -1162,8 +1211,6 @@ JSQMessagesKeyboardControllerDelegate>
     [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
                                   bottomValue:defaultBottomInset + adContainerInset + chatMetadataContainerInset
                                      animated:animated];
-
-
 }
 
 - (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top
@@ -1171,12 +1218,20 @@ JSQMessagesKeyboardControllerDelegate>
                                    animated:(BOOL)animated
 {
     UIEdgeInsets insets = UIEdgeInsetsMake(top, 0.0f, bottom, 0.0f);
+    __weak __typeof(self)weakSelf = self;
 
     if (animated) {
         POPBasicAnimation *a0 = [POPBasicAnimation easeOutAnimation];
         a0.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
         a0.toValue = [NSValue valueWithUIEdgeInsets:insets];
         a0.duration = kSearchBarAnimationDuration;
+        [a0 setCompletionBlock:^(POPAnimation *anim, BOOL done) {
+            if (done) {
+                __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+                [strongSelf toolbarAnimationDidComplete];
+            }
+        }];
 
         // KEY is important to ensure no collisions with other animations in this file
         [self.collectionView pop_addAnimation:a0 forKey:@"collectionView kPOPScrollViewContentInset"];
@@ -1364,6 +1419,7 @@ JSQMessagesKeyboardControllerDelegate>
 #pragma mark - SCRUFF Additions for searchResultsContainerView
 
 - (void)searchResultsContainerViewVisible:(BOOL)visible animated:(BOOL)animated {
+    __weak __typeof(self)weakSelf = self;
     CGFloat hiddenHeight = self.inputToolbar.contentView.hiddenTopOffsetConstraintValue;
 
     // When this method is called, we have already swapped out the subview
@@ -1383,6 +1439,13 @@ JSQMessagesKeyboardControllerDelegate>
     a0.property = [POPAnimatableProperty propertyWithName:kPOPLayoutConstraintConstant];
     a0.toValue = visible ? @(self.inputToolbar.contentView.searchResultsContainerViewContentHeight) : @(0);
     a0.duration = kSearchBarAnimationDuration;
+    [a0 setCompletionBlock:^(POPAnimation *anim, BOOL done) {
+        if (done) {
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+            [strongSelf toolbarAnimationDidComplete];
+        }
+    }];
 
     // Because this constraint could be in the middle of changing, we cannot trust
     // its current value if we are in the middle of an animation
@@ -1401,9 +1464,12 @@ JSQMessagesKeyboardControllerDelegate>
 
     a1.duration = kSearchBarAnimationDuration;
     [a1 setCompletionBlock:^(POPAnimation *a, BOOL done) {
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+
         if (done) {
-            [self jsq_updateKeyboardTriggerPoint];
-            [self searchResultsContainerViewChanged];
+            [strongSelf jsq_updateKeyboardTriggerPoint];
+            [strongSelf searchResultsContainerViewChanged];
+            [strongSelf toolbarAnimationDidComplete];
         }
     }];
 
@@ -1420,6 +1486,13 @@ JSQMessagesKeyboardControllerDelegate>
     a2.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewContentInset];
     a2.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
     a2.duration = kSearchBarAnimationDuration;
+    [a2 setCompletionBlock:^(POPAnimation *anim, BOOL done) {
+        if (done) {
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+            [strongSelf toolbarAnimationDidComplete];
+        }
+    }];
 
     [self.collectionView pop_addAnimation:a2 forKey:@"collectionView kPOPScrollViewContentInset"];
 
@@ -1427,6 +1500,13 @@ JSQMessagesKeyboardControllerDelegate>
     a3.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewScrollIndicatorInsets];
     a3.toValue = [NSValue valueWithUIEdgeInsets:finalEdgeInsetsAfterCurrentAnimation];
     a3.duration = kSearchBarAnimationDuration;
+    [a3 setCompletionBlock:^(POPAnimation *anim, BOOL done) {
+        if (done) {
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+            [strongSelf toolbarAnimationDidComplete];
+        }
+    }];
 
     [self.collectionView pop_addAnimation:a3 forKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
 
@@ -1440,6 +1520,13 @@ JSQMessagesKeyboardControllerDelegate>
         a4.toValue = [NSValue valueWithCGPoint:CGPointMake(0, [self requiredScrollOffsetToBeAtBottom:dy
                                                                                          finalInsets:finalEdgeInsetsAfterCurrentAnimation])];
         a4.duration = kSearchBarAnimationDuration;
+        [a4 setCompletionBlock:^(POPAnimation *anim, BOOL done) {
+            if (done) {
+                __strong __typeof(weakSelf)strongSelf = weakSelf;
+
+                [strongSelf toolbarAnimationDidComplete];
+            }
+        }];
 
         [self.collectionView pop_addAnimation:a4 forKey:@"collectionView kPOPScrollViewContentOffset"];
     }

@@ -381,5 +381,6 @@ extern CGFloat const kSearchBarAnimationDuration;
 - (void)searchResultsContainerViewVisible:(BOOL)visible animated:(BOOL)animated;
 - (void)searchResultsContainerViewChanged;
 - (void)cancelContentSpecificAnimations;
+- (void)jsq_toolbarAnimationsCompleted;
 
 @end
