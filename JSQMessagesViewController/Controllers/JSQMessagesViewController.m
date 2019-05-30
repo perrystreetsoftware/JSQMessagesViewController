@@ -85,11 +85,11 @@ JSQMessagesKeyboardControllerDelegate>
 
 #pragma mark - Class methods
 
-//+ (UINib *)nib
-//{
-//    return [UINib nibWithNibName:NSStringFromClass([JSQMessagesViewController class])
-//                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
-//}
++ (UINib *)nib
+{
+    return [UINib nibWithNibName:NSStringFromClass([JSQMessagesViewController class])
+                          bundle:[NSBundle bundleForClass:[JSQMessagesViewController class]]];
+}
 
 + (instancetype)messagesViewController
 {
