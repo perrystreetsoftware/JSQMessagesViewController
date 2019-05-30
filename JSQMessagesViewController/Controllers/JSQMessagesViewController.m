@@ -1643,4 +1643,18 @@ JSQMessagesKeyboardControllerDelegate>
     }
 }
 
+#pragma mark - SCRUFF Styling methods
+
+// When we change our input toolbar typing attributes, we must also change
+// our preferred default height and the constraint that controls it.
+- (void)setInputToolbarTypingAttributes:(NSMutableDictionary *)attributes {
+    self.inputToolbar.contentView.textView.typingAttributes = attributes;
+
+    // This logic is replicated from JSQMessagesInputToolbar.m, awakeFromNib
+    [self.inputToolbar.contentView.textView sizeToFit];
+    self.inputToolbar.preferredDefaultHeight = self.inputToolbar.contentView.textView.frame.size.height + 16;
+
+    self.toolbarHeightConstraint.constant = self.inputToolbar.preferredDefaultHeight;
+}
+
 @end

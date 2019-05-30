@@ -382,5 +382,6 @@ extern CGFloat const kSearchBarAnimationDuration;
 - (void)searchResultsContainerViewChanged;
 - (void)cancelContentSpecificAnimations;
 - (void)jsq_toolbarAnimationsCompleted;
+- (void)setInputToolbarTypingAttributes:(NSMutableDictionary *)attributes;
 
 @end
