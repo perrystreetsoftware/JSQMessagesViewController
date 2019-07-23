@@ -277,7 +277,7 @@ JSQMessagesKeyboardControllerDelegate>
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
 
-    // Because the topLayoutGuide.length is now valid
+    // Because the view.safeAreaInsets.top is now valid
     [self jsq_updateCollectionViewInsetsAnimated:NO];
 }
 
@@ -1022,7 +1022,7 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (BOOL)jsq_inputToolbarHasReachedMaximumHeight
 {
-    return CGRectGetMinY(self.inputToolbar.frame) == (self.topLayoutGuide.length + self.topContentAdditionalInset);
+    return CGRectGetMinY(self.inputToolbar.frame) == (self.view.safeAreaInsets.top + self.topContentAdditionalInset);
 }
 
 - (void)jsq_adjustInputToolbarForComposerTextViewContentSizeChange:(CGFloat)dy
@@ -1042,8 +1042,8 @@ JSQMessagesKeyboardControllerDelegate>
     CGFloat newToolbarOriginY = toolbarOriginY - dy;
 
     //  attempted to increase origin.Y above topLayoutGuide
-    if (newToolbarOriginY <= self.topLayoutGuide.length + self.topContentAdditionalInset) {
-        dy = toolbarOriginY - (self.topLayoutGuide.length + self.topContentAdditionalInset);
+    if (newToolbarOriginY <= self.view.safeAreaInsets.top + self.topContentAdditionalInset) {
+        dy = toolbarOriginY - (self.view.safeAreaInsets.top + self.topContentAdditionalInset);
         [self jsq_scrollComposerTextViewToBottomAnimated:YES];
     }
 
@@ -1208,7 +1208,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.adContainerHeightConstraint.constant = adContainerInset;
     self.chatMetadataContainerHeightConstraint.constant = chatMetadataContainerInset;
 
-    [self jsq_setCollectionViewInsetsTopValue:self.topLayoutGuide.length + self.topContentAdditionalInset
+    [self jsq_setCollectionViewInsetsTopValue:self.view.safeAreaInsets.top + self.topContentAdditionalInset
                                   bottomValue:defaultBottomInset + adContainerInset + chatMetadataContainerInset
                                      animated:animated];
 }
@@ -1580,7 +1580,7 @@ JSQMessagesKeyboardControllerDelegate>
     self.adContainerHeightConstraint.constant = adContainerInset;
     self.chatMetadataContainerHeightConstraint.constant = chatMetadataContainerInset;
 
-    UIEdgeInsets insets = UIEdgeInsetsMake(self.topLayoutGuide.length + self.topContentAdditionalInset, 0.0f, defaultBottomInset + adContainerInset + chatMetadataContainerInset + dy, 0.0f);
+    UIEdgeInsets insets = UIEdgeInsetsMake(self.view.safeAreaInsets.top + self.topContentAdditionalInset, 0.0f, defaultBottomInset + adContainerInset + chatMetadataContainerInset + dy, 0.0f);
 
     return insets;
 }
