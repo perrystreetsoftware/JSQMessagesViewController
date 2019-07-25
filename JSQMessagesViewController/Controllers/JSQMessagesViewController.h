@@ -384,4 +384,7 @@ extern CGFloat const kSearchBarAnimationDuration;
 - (void)jsq_toolbarAnimationsCompleted;
 - (void)setInputToolbarTypingAttributes:(NSMutableDictionary *)attributes;
 
+// SCRUFF addition - 2019-07-24
+- (void)relayoutViewAfterInputToolbarHeightChange;
+
 @end
