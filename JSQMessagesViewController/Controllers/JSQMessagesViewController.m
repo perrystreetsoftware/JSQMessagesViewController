@@ -1111,9 +1111,18 @@ JSQMessagesKeyboardControllerDelegate>
             // run loop
             if ([UIDevice jsq_isCurrentDeviceEqualOrAfteriOS13]) {
                 // When we do our layout on a separate run loop, there
-                // are scrolling operations that are apparently created
-                // that will continue to run and break our content offset
-                // So, we must kill them before the re-layout
+                // are animated scrolling operations that are created
+                // starting in iOS 13 mean to animate the scrollView to the
+                // caret (I empirically observed these in iOS13 but not iOS12
+                // by looking at the call stack)
+                //
+                // These scrolling animations cause our content offset
+                // to get screwed up and part of the content scrolls
+                // off the screen
+                //
+                // So, we must kill current scroll operations before
+                // starting the re-layout
+                // see: https://stackoverflow.com/a/23290943
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self killInputToolbarTextViewScrollingOperations];
                     [self relayoutViewAfterInputToolbarHeightChange];
