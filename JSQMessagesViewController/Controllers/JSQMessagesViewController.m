@@ -1110,7 +1110,12 @@ JSQMessagesKeyboardControllerDelegate>
             // trigger KVO changes unless we did this on a separate
             // run loop
             if ([UIDevice jsq_isCurrentDeviceEqualOrAfteriOS13]) {
+                // When we do our layout on a separate run loop, there
+                // are scrolling operations that are apparently created
+                // that will continue to run and break our content offset
+                // So, we must kill them before the re-layout
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    [self killInputToolbarTextViewScrollingOperations];
                     [self relayoutViewAfterInputToolbarHeightChange];
                 });
             } else {
@@ -1118,6 +1123,10 @@ JSQMessagesKeyboardControllerDelegate>
             }
         }
     }
+}
+
+- (void)killInputToolbarTextViewScrollingOperations {
+    [self.inputToolbar.contentView.textView setContentOffset:self.inputToolbar.contentView.textView.contentOffset animated:NO];
 }
 
 - (void)relayoutViewAfterInputToolbarHeightChange {
