@@ -32,10 +32,10 @@
     return [[UIDevice currentDevice].systemVersion compare:@"9.0" options:NSNumericSearch] == NSOrderedDescending;
 }
 
-+ (BOOL)jsq_isCurrentDeviceAfteriOS12
++ (BOOL)jsq_isCurrentDeviceEqualOrAfteriOS13
 {
-    // iOS > 12.0
-    return [[UIDevice currentDevice].systemVersion compare:@"12.0" options:NSNumericSearch] == NSOrderedDescending;
+    // iOS >= 13
+    return [[[UIDevice currentDevice] systemVersion] compare:@"13.0" options:NSNumericSearch] != NSOrderedAscending;
 }
 
 @end

@@ -1109,7 +1109,7 @@ JSQMessagesKeyboardControllerDelegate>
             // We found a bug on iOS 13 where this would repeatedly
             // trigger KVO changes unless we did this on a separate
             // run loop
-            if ([UIDevice jsq_isCurrentDeviceAfteriOS12]) {
+            if ([UIDevice jsq_isCurrentDeviceEqualOrAfteriOS13]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self relayoutViewAfterInputToolbarHeightChange];
                 });

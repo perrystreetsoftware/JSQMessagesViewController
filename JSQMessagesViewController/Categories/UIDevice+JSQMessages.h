@@ -31,8 +31,8 @@
 + (BOOL)jsq_isCurrentDeviceAfteriOS9;
 
 /**
- *  @return Whether or not the current device is running a version of iOS after 12.0.
+ *  @return Whether or not the current device is running a version of iOS equal or after 13.0.
  */
-+ (BOOL)jsq_isCurrentDeviceAfteriOS12;
++ (BOOL)jsq_isCurrentDeviceEqualOrAfteriOS13;
 
 @end
