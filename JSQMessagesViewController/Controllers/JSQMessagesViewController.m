@@ -1241,12 +1241,36 @@ JSQMessagesKeyboardControllerDelegate>
                                      animated:animated];
 }
 
+- (BOOL)isAlreadyAnimatingContentInsetTo:(UIEdgeInsets)insets {
+
+    POPBasicAnimation *activeContentInsetAnimation = [self.collectionView pop_animationForKey:@"collectionView kPOPScrollViewContentInset"];
+
+    if (activeContentInsetAnimation) {
+        NSValue *targetContentInset = activeContentInsetAnimation.toValue;
+
+        return (targetContentInset &&
+                UIEdgeInsetsEqualToEdgeInsets(insets, targetContentInset.UIEdgeInsetsValue));
+    }
+
+    return NO;
+}
+
 - (void)jsq_setCollectionViewInsetsTopValue:(CGFloat)top
                                 bottomValue:(CGFloat)bottom
                                    animated:(BOOL)animated
 {
     UIEdgeInsets insets = UIEdgeInsetsMake(top, 0.0f, bottom, 0.0f);
+
+    // If we don't do this check, we end up getting "flashes" as we start
+    // an animator, then viewDidLayoutSubviews gets called and it
+    // momentarily sets the top and bottom values and then the animation
+    // continues and resets it back to the old value
+    if ([self isAlreadyAnimatingContentInsetTo:insets]) {
+        return;
+    }
+
     __weak __typeof(self)weakSelf = self;
+
 
     if (animated) {
         POPBasicAnimation *a0 = [POPBasicAnimation easeOutAnimation];
@@ -1395,23 +1419,28 @@ JSQMessagesKeyboardControllerDelegate>
 }
 
 - (void)hidePickerViewShowingKeyboard:(BOOL)showKeyboard {
-    self.isPickerViewVisible = NO;
+    // Only run if the picker view is ACTUALLY visible
+    // otherwise this causes a visible flash when going
+    // from gif to text view
+    if (self.isPickerViewVisible) {
+        self.isPickerViewVisible = NO;
 
-    // First, hide the pickerView
-    [self.inputToolbar.contentView.textView resignFirstResponder];
+        // First, hide the pickerView
+        [self.inputToolbar.contentView.textView resignFirstResponder];
 
-    // Set the custom inputView to nil to restore the keyboard
-    self.inputToolbar.contentView.textView.inputView = nil;
+        // Set the custom inputView to nil to restore the keyboard
+        self.inputToolbar.contentView.textView.inputView = nil;
 
-    // Show the input toolbar again
-    [self setInputToolbarHidden:NO];
+        // Show the input toolbar again
+        [self setInputToolbarHidden:NO];
 
-    [self.inputToolbar.contentView.textView reloadInputViews];
+        [self.inputToolbar.contentView.textView reloadInputViews];
 
-    if (showKeyboard) {
-        [self.inputToolbar.contentView.textView becomeFirstResponder];
-        [self jsq_updateCollectionViewInsetsAnimated:NO];
-        [self scrollToBottomAnimated:NO];
+        if (showKeyboard) {
+            [self.inputToolbar.contentView.textView becomeFirstResponder];
+            [self jsq_updateCollectionViewInsetsAnimated:NO];
+            [self scrollToBottomAnimated:NO];
+        }
     }
 }
 
