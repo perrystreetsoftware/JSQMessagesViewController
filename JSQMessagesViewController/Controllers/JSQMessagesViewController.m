@@ -1287,13 +1287,20 @@ JSQMessagesKeyboardControllerDelegate>
 
         // KEY is important to ensure no collisions with other animations in this file
         [self.collectionView pop_addAnimation:a0 forKey:@"collectionView kPOPScrollViewContentInset"];
+
+        // Also animate scroll indicator insets
+        POPBasicAnimation *a1 = [POPBasicAnimation easeOutAnimation];
+        a1.property = [POPAnimatableProperty propertyWithName:kPOPScrollViewScrollIndicatorInsets];
+        a1.toValue = [NSValue valueWithUIEdgeInsets:insets];
+        a1.duration = kSearchBarAnimationDuration;
+
+        [self.collectionView pop_addAnimation:a1 forKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
     } else {
         [self.collectionView pop_removeAnimationForKey:@"collectionView kPOPScrollViewContentInset"];
+        [self.collectionView pop_removeAnimationForKey:@"collectionView kPOPScrollViewScrollIndicatorInsets"];
         self.collectionView.contentInset = insets;
+        self.collectionView.scrollIndicatorInsets = insets;
     }
-
-    // No one really sees these so no need to animate
-    self.collectionView.scrollIndicatorInsets = insets;
 }
 
 - (BOOL)jsq_isMenuVisible
